@@ -111,7 +111,7 @@ interClass<-function(pca,data,pos,C=3,r=13){
   G<-which(unlist(lapply(sm,function(x) x> m+v*C)))
   data.frame(data=unlist(lapply(seq(r),function(x) mean(data[G,x])/mean(data[S,x]))),row.names=cats)}
 
-if ()
+pcaAnalysisTest<- function()
 {
 root_file<-"~/Dropbox/UTX-Alex/jan/"
 mock<-cbind("combined")
