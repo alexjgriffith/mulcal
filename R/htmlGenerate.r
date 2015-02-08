@@ -30,7 +30,7 @@
 ######################################################################
 
 library('getopt')
-loadProject("../src/r/",c("aux.r","html.r"))
+#loadProject("../src/r/",c("aux.r","html.r"))
 
 loadData<-function(fileLocation){
     data<-read.delim(fileLocation,header=FALSE,sep="\n")    

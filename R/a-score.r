@@ -17,7 +17,7 @@
 
 
 library('getopt')
-loadProject("../src/r/","pcaAnalysis.r")
+#loadProject("../src/r/","pcaAnalysis.r")
 spec = matrix(c(
     'fileLocation','i', 1,"character",
     'catagories','c', 1,"character",
