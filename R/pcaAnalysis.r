@@ -7,10 +7,7 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 #
-#
-######################################################################
-######################################################################
-#
+
 # Usage:
 #
 # root_file<-"~/Dropbox/UTX-Alex/october/all-data/"
@@ -49,6 +46,14 @@ interlace<-function(...){t(cbind(...))}
 lines<-apply(pcs$rotation,2,function(x){c(x[c(1,2,3)],colnames(pcs$rotation)[c(1,2,3)])})
 }
 
+
+#' load height file
+#'
+#' loads a tab seperated file with pasted heights of the format
+#' <chr><start><end><height1>...<heightn>
+#'
+#' @export
+#' @return c(stats=matrix(),data=matrix())
 loadData<-function(file="~/masters/normal-abnormal/single_heights.bed"){  
   cdata<-read.table(file)
   stats<-cdata[c(1,2,3)]

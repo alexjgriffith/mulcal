@@ -18,7 +18,7 @@
 # body<-htmlTags("body",htmlTags("p","This is the test page."))
 # htmlDoc(head,body)
 
-source("aux.r")
+#source("aux.r")
 
 buildAnotations<-function(...){
     value<-c(...)

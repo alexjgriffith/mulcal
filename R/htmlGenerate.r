@@ -143,30 +143,30 @@ htmlGenerateHelp <- function(){
     write(lcollapse(output),stdout())
     quit()}
 
-main<-function(){
-    spec = matrix(c(
-        'fileLocation','f', 1,"character",
-        'imageDirectory','i', 1,"character",
-        'pScoreFile','p', 1,"character",
-        'sets','s', 1,"character",
-        'outFile','o', 1,"character",
-        'shortNames','n',1,"character",
-        'help','h',0,"logical",
-        'generateLogos',"g",0,"logical"
-    ),byrow=TRUE,ncol=4)
-    args=getopt(spec)
-    if(! is.null(args$help)){htmlGenerateHelp()}
-    if(is.null(args$generateLogos)){args$generateLogos=FALSE}
-    with(as.list(args),{
-        sets<-strsplit(sets,",")[[1]]
-        shortNames<-strsplit(shortNames,",")[[1]]
-        n=length(sets)
-        if(generateLogos)
-            {library("seqLogo")
-             printFasta(fileLocation,sets,shortNames,imageDirectory)}
-        write(
-            htmlGenerateMain(fileLocation,sets,shortNames,imageDirectory,n,pScoreFile)
-           ,outFile)})}
-
-main()
+# main<-function(){
+#    spec = matrix(c(
+#        'fileLocation','f', 1,"character",
+#        'imageDirectory','i', 1,"character",
+#        'pScoreFile','p', 1,"character",
+#        'sets','s', 1,"character",
+#        'outFile','o', 1,"character",
+#        'shortNames','n',1,"character",
+#        'help','h',0,"logical",
+#        'generateLogos',"g",0,"logical"
+#    ),byrow=TRUE,ncol=4)
+#    args=getopt::getopt(spec=spec)
+#    if(! is.null(args$help)){htmlGenerateHelp()}
+#    if(is.null(args$generateLogos)){args$generateLogos=FALSE}
+#    with(as.list(args),{
+#        sets<-strsplit(sets,",")[[1]]
+#        shortNames<-strsplit(shortNames,",")[[1]]
+#        n=length(sets)
+#        if(generateLogos)
+#            {library("seqLogo")
+#             printFasta(fileLocation,sets,shortNames,imageDirectory)}
+#        write(
+#            htmlGenerateMain(fileLocation,sets,shortNames,imageDirectory,n,pScoreFile)
+#           ,outFile)})}
+# 
+# main()
 
