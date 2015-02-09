@@ -18,9 +18,7 @@ library(parallel)
 #' @export
 #' @template authorTemplate
 #' @examples
-#'
-#'  data<-loadBedFile(file="filelocation")
-#' 
+#'  data<-loadBedFile(file="filelocation")  
 loadBedFile<-function(file){
     file<-normalizePath(file)
     if(!file.exists(file)){
