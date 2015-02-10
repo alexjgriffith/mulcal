@@ -7,8 +7,7 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 
-#' @import parallel
-library(parallel)
+#library(parallel)
 
 #' loadBedFile
 #' 
@@ -128,6 +127,10 @@ mainProf<-function(file="/home/agriffith/Dropbox/UTX-Alex/jan/combined_sorted.be
     Rprof(NULL)
     summaryRprof("temp.prof")}
 
+
+#' test
+#'
+#' @export
 testHeights<-function(){
     file<-"/home/griffita/Dropbox/UTX-Alex/jan/combined_sorted.bed"
 

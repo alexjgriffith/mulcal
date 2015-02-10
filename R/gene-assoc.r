@@ -7,16 +7,6 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 #
-#######################################################################
-######################################################################
-#
-# Usage:
-#
-# fileLocation="~/Dropbox/UTX-Alex/jan/"
-# bedData<-read.delim(paste(fileLocation,"combined_sorted.bed",sep=""),header=0)
-# geneList<-read.delim(paste(fileLocation,"hg19.RefSeqGenes.csv",sep=""))
-# genes<-geneAssociation(bedData,geneList,  c(50000,0,0,0))
-# write.table(cbind(bedData,unlist(t(lapply(genes, function(x) {if(identical(x,character(0))){"None"} else{x}})))) ,"combined_tagged_genes.bed" ,col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
 
 library(parallel)
 
@@ -55,6 +45,25 @@ leneAssoc<-function(point,geneList,bounds){
 minGene<-function(x,y){
     x[order(abs(x-y))]}
 
+
+#' Gene Association
+#'
+#' Assosiate each ChIP enrinchement region with the closest peak within a bound defined by the user
+#'
+#' @param bedData three column data.frame 
+#' @param geneList a data.frame loaded without a header from the refseq gene data base
+#' @param bounds c(A,B,C,D) Region 1 = (tss-A,tss+B) Region 2 = (ess-C ess+D)
+#' @param n Number of nodes to use.
+#'
+#' @examples
+#' fileLocation="~/Dropbox/UTX-Alex/jan/"
+#' bedData<-read.delim(paste(fileLocation,"combined_sorted.bed",sep=""),header=0)
+#' geneList<-read.delim(paste(fileLocation,"hg19.RefSeqGenes.csv",sep=""))
+#' genes<-geneAssociation(bedData,geneList,  c(50000,0,0,0))
+#' write.table(cbind(bedData,unlist(t(lapply(genes, function(x) {if(identical(x,character(0))){"None"} else{x}})))) ,"combined_tagged_genes.bed" ,col.names=FALSE,row.names=FALSE,quote=FALSE,sep="\t")
+#' 
+#' @export
+#' @template authorTemplate
 geneAssociation<-function(bedData,geneList,bounds,n=FALSE){
     if(is.logical(n)){
         peak<-(as.numeric(bedData[,2])+as.numeric(bedData[,3]))/2    
