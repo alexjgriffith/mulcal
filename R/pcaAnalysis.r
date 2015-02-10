@@ -93,50 +93,103 @@ pcaAnalysis<-function(heightFile,catFile,normMethod="colQn")
 ascoreWeighting<-function(pcs,scores,weights){
     t(matrix(weights))%*%t(as.matrix(pcs$rotation[,scores]))}
 
-
+#' The Processing of PC values
+#'
+#' A utility designed to help seperate a vector based on the mean and standard deviation of the data. For the most part ascoreSeparation will return a vector of logicals but funs such as "value" and "rank" return numerics.
+#' 
+#' @template authorTemplate
+#' @param vect A vector of numerical values.
+#' @param fun A function which is used to sepearate memebers of the vector.
+#'
+#' 
+#' \describe{
+#' \item{\strong{"top"}}{TRUE if greater than mean + n* standard deviation.}
+#' \item{\strong{"bottom"}}{TRUE if less than mean - n* standard deviation.}
+#' \item{\strong{"nottop"}}{TRUE if less than mean + n* standard deviation.}
+#' \item{\strong{"notbottom"}}{TRUE if greater than mean - n* standard deviation.}
+#' \item{\strong{"middle"}}{TRUE if within mean +/- n* standard deviation.}
+#' \item{\strong{"value"}}{Returns the principle component of interest.}
+#' \item{\strong{"rank"}}{Returns the ranks of the principle components.}
+#' }
+#' @param n The value which is used to adjust the standard deviation cut off.
+#' @return A vector of equal length to the parameter vect.
+#' @export
 ascoreSeperation<-function(vect,fun,n=1){
-    ap<-switch(fun,
-           top=function(x,m,sd,n){x>m+sd*n},
-           bottom=function(x,m,sd,n){x<m-sd*n},
-           nottop=function(x,m,sd,n){x<=m+sd*n},
-           notbottom=function(x,m,sd,n){x>=m-sd*n},
-           notbottom=function(x,m,sd,n){all(x>=m-sd*n,x<=m+sd*n)})
-    m<-mean(vect)
-    sd<-sqrt(var(vect))
-    sapply(vect,ap,m,sd,n)}
+    loopfuns<-c("top","bottom","nottop","notbottom","middle","value")
+    if(fun %in% loopfuns){
+        ap<-switch(fun,
+                   top=function(x,m,sd,n){x>m+sd*n},
+                   bottom=function(x,m,sd,n){x<m-sd*n},
+                   nottop=function(x,m,sd,n){x<=m+sd*n},
+                   notbottom=function(x,m,sd,n){x>=m-sd*n},
+                   middle=function(x,m,sd,n){all(x>=m-sd*n,x<=m+sd*n)},
+                   value=function(x,m,sd,n){x})
+        m<-mean(vect)
+        sd<-sqrt(var(vect))
+        sapply(vect,ap,m,sd,n)}
+    else if(fun =="ranked"){
+        order(vect)}
+    else
+        vect}
 
+
+#' Batch alpha score seperation
+#'
+#' Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.
+#'
+#' @seealso \code{\link{ascoreSeperation()}}
+#' @seealso \code{\link{ascore()}}
+#' @export
+#' 
 batchscore<-function(pcs,scores,funs,ns){
     mapply(function(x,y,z){ascoreSeperation(pcs$rotation[,x],y,z)},
            scores,funs,ns)    }
 
 #' Alpha Score
 #'
-#'
+#' Returns a seperating vector built from principle components. returns a matrix with a length of the data set inputed in heightFile and a width of the lenght of the number of options. As such a wide variety of seperating mechanisms can be called at the same time automating the process of isolating regions of data.
+#' 
 #' @param heightFile Can be either a file name, a data.frame, or a matrix
-#' @param pc The principle component of interest
-#' @param funs funs=c("top","bottom","nottop","notbottom","middle")
+#' @param pc The principle component of interest, note the length of pc, funs and ns must be the same.
+#' @param funs funs=c("top","bottom","nottop","notbottom","middle","ranked","value")
 #' @param ns An integer to adjust the SD in the fun
 #' @param normMethod Default="colQn", use "non" if no normalization is desired
+#' @seealso For more infromation on callable functions \code{\link{ascoreSeperation()}}
+#' @return An nxm matrix where n=length of data and m=number of optoins.
 #' @export
 #' @examples
-#'    # load a bed file of format
-#'    # chr start end h1 ... hn
-#'    heightFile<-"some_bed_file.bed"
 #' 
-#'    # loadHeightFile splits the first three columns into
-#'    # stats and the remainder into data
-#'    values<-loadHeightFile(heightFile)
+#' # load a bed file of format
+#' # chr start end h1 ... hn
+#' heightFile<-"some_bed_file.bed"
 #' 
-#'    data<-values$data
-#'    stats<-values$stats
-#'    pc<-1
-#'    function<-"top" # x>mean+sd*n
-#'    n<-3
-#'    reg<-ascore(data,pc,function,n) 
-#'    stats[reg]
+#' # loadHeightFile splits the first three columns into
+#' # stats and the remainder into data
+#' # You can use any utiltity you wish to load data so
+#' # long as it clearly seperates the data (heights, read pile up,
+#' # etc) from the stats (chromosome inforomation, data source, genes etc)
+#' values<-loadHeightFile(heightFile)
+#' data<-values$data
+#' stats<-values$stats
+#' 
+#' pc<-1
+#' function<-"top" # x>mean+sd*n
+#' n<-3
+#' reg<-ascore(data,pc,function,n) 
+#' stats[reg]
+#' 
+#' # Determining two values at the same time
+#' reg2<-ascore(data,c(1,2),c("top","top"),c(3,1))
+#' regions<-apply(reg2,1,all)
+#' stats[regions]
+#'
+#' # Saving the first 3 principle components
+#' pcs<-ascore(data,c(1,2,3,4))
+#'
+#' reg4<-ascoreSeperation(pcs[1,],"top",3)
 #' 
 #' @template authorTemplate
-ascore<-function(heightFile,pc,funs,ns,normMethod="colQn"){
+ascore<-function(heightFile,pc,funs=rep("value",length(pc)),ns=rep(0,length(pc)),normMethod="colQn"){
     if(is.character(heightFile)){
         values<-loadHeightFile(heightFile)
         data<-values$data}

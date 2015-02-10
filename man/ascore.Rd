@@ -7,40 +7,60 @@
 \url{https://github.com/alexjgriffith/mulcal}
 }
 \usage{
-ascore(heightFile, pc, funs, ns, normMethod = "colQn")
+ascore(heightFile, pc, funs = rep("value", length(pc)), ns = rep(0,
+  length(pc)), normMethod = "colQn")
 }
 \arguments{
 \item{heightFile}{Can be either a file name, a data.frame, or a matrix}
 
-\item{pc}{The principle component of interest}
+\item{pc}{The principle component of interest, note the length of pc, funs and ns must be the same.}
 
-\item{funs}{funs=c("top","bottom","nottop","notbottom","middle")}
+\item{funs}{funs=c("top","bottom","nottop","notbottom","middle","ranked","value")}
 
 \item{ns}{An integer to adjust the SD in the fun}
 
 \item{normMethod}{Default="colQn", use "non" if no normalization is desired}
 }
+\value{
+An nxm matrix where n=length of data and m=number of optoins.
+}
 \description{
-Alpha Score
+Returns a seperating vector built from principle components. returns a matrix with a length of the data set inputed in heightFile and a width of the lenght of the number of options. As such a wide variety of seperating mechanisms can be called at the same time automating the process of isolating regions of data.
 }
 \examples{
 # load a bed file of format
-   # chr start end h1 ... hn
-   heightFile<-"some_bed_file.bed"
+# chr start end h1 ... hn
+heightFile<-"some_bed_file.bed"
 
-   # loadHeightFile splits the first three columns into
-   # stats and the remainder into data
-   values<-loadHeightFile(heightFile)
+# loadHeightFile splits the first three columns into
+# stats and the remainder into data
+# You can use any utiltity you wish to load data so
+# long as it clearly seperates the data (heights, read pile up,
+# etc) from the stats (chromosome inforomation, data source, genes etc)
+values<-loadHeightFile(heightFile)
+data<-values$data
+stats<-values$stats
 
-   data<-values$data
-   stats<-values$stats
-   pc<-1
-   function<-"top" # x>mean+sd*n
-   n<-3
-   reg<-ascore(data,pc,function,n)
-   stats[reg]
+pc<-1
+function<-"top" # x>mean+sd*n
+n<-3
+reg<-ascore(data,pc,function,n)
+stats[reg]
+
+# Determining two values at the same time
+reg2<-ascore(data,c(1,2),c("top","top"),c(3,1))
+regions<-apply(reg2,1,all)
+stats[regions]
+
+# Saving the first 3 principle components
+pcs<-ascore(data,c(1,2,3,4))
+
+reg4<-ascoreSeperation(pcs[1,],"top",3)
 }
 \author{
 Alexander Griffith griffita@gmail.com
+}
+\seealso{
+For more infromation on callable functions \code{\link{ascoreSeperation()}}
 }
 
