@@ -2,12 +2,15 @@ Package: mulcal
 Title: To facilitate the analysis of multiple ChIP-Seq data sets
 Version: 0.0.0.9000
 Authors@R: person("Alexander", "Griffith", , "griffitaj@gmail.com", role = c("aut", "cre"))
-Description: 
-Depends:
-    R (>= 2.14.1)
+Description: joint
+Depends: 
+    R (>= 3.0.0)
 Imports:
     Biostrings,
     getopt,	
     parallel
+Suggests:
+	knitr
 License: BSD + file LICENSE
 LazyData: true
+VignetteBuilder: knitr

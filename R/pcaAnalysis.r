@@ -8,6 +8,7 @@
 # Contact: griffitaj@gmail.com
 #
 
+#' @export
 loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed"){  
   cdata<-read.table(file)
   stats<-cdata[c(1,2,3)]
@@ -15,6 +16,7 @@ loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed"){
   list(stats=as.matrix(stats),
             data=as.matrix(apply(cdata[4:l],2, function(x) as.vector((unlist(x/(stats[3]-stats[2])))))))}
 
+#' @export
 qn <-function(data){
     shape<-dim(data)
     sequence<-apply(data,2,order)
@@ -22,6 +24,7 @@ qn <-function(data){
     ranks<-apply(matrix(unlist(lapply(seq(shape[2]),function(i,x,y) x[y[,i],i],data,sequence)),ncol=shape[2]),1,sum)/shape[2]
     apply(reverseSequence,2,function(x) ranks[x])}
 
+#' @export
 standPCAPrep <-function(data,v){
   switch(v,
          rowSumOne=t(apply(data,1, function(x) {x/sum(x)})),
@@ -46,12 +49,14 @@ plotHist<-function(pcs,pos){
   x<-pcs$rotation[,pos] * pcs$sdev[pos]
   hist(x,1000)}
 
+
 plotBox<-function(pcs,pos,data,cats){
   x<-t(as.matrix(pcs$rotation)) %*% as.matrix(data)
   d<-data.frame(x[pos,],row.names=cats)
   boxplot(t(d),las=2)
   text(seq(length(cats)),x[pos,],labels=cats,cex=0.7,pos=3)}
 
+#' @export
 plotPCs<-function(pcs,pos,data,cats,lab=c("xlabel","ylable","Title")){
     x<-t(as.matrix(pcs$rotation)) %*% as.matrix(data)
     d1<-data.frame(x[pos[1],])
@@ -60,6 +65,7 @@ plotPCs<-function(pcs,pos,data,cats,lab=c("xlabel","ylable","Title")){
     title(main=lab[3])
     text(x[pos[1],],x[pos[2],],labels=cats,cex=0.7,pos=3)}
 
+#' @export
 interClass<-function(pca,data,pos,C=3,r=13){
   sm<-data %*%  pca$rotation[,pos]
   m<-mean(sm)
@@ -137,8 +143,8 @@ ascoreSeperation<-function(vect,fun,n=1){
 #'
 #' Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.
 #'
-#' @seealso \code{\link{ascoreSeperation()}}
-#' @seealso \code{\link{ascore()}}
+#' @seealso \code{\link{ascoreSeperation}}
+#' @seealso \code{\link{ascore}}
 #' @export
 #' 
 batchscore<-function(pcs,scores,funs,ns){
@@ -154,7 +160,7 @@ batchscore<-function(pcs,scores,funs,ns){
 #' @param funs funs=c("top","bottom","nottop","notbottom","middle","ranked","value")
 #' @param ns An integer to adjust the SD in the fun
 #' @param normMethod Default="colQn", use "non" if no normalization is desired
-#' @seealso For more infromation on callable functions \code{\link{ascoreSeperation()}}
+#' @seealso For more infromation on callable functions \code{\link{ascoreSeperation}}
 #' @return An nxm matrix where n=length of data and m=number of optoins.
 #' @export
 #' @examples

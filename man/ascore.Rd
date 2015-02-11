@@ -61,6 +61,6 @@ reg4<-ascoreSeperation(pcs[1,],"top",3)
 Alexander Griffith griffita@gmail.com
 }
 \seealso{
-For more infromation on callable functions \code{\link{ascoreSeperation()}}
+For more infromation on callable functions \code{\link{ascoreSeperation}}
 }
 

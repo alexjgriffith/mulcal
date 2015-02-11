@@ -10,8 +10,8 @@ batchscore(pcs, scores, funs, ns)
 Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.
 }
 \seealso{
-\code{\link{ascoreSeperation()}}
+\code{\link{ascoreSeperation}}
 
-\code{\link{ascore()}}
+\code{\link{ascore}}
 }
 
