@@ -25,61 +25,17 @@
 ######################################################################
 ######################################################################
 
-
-######################################################################
-######################################################################
-
-library('getopt')
-#loadProject("../src/r/",c("aux.r","html.r"))
-
-loadData<-function(fileLocation){
-    data<-read.delim(fileLocation,header=FALSE,sep="\n")    
-    out<-list()
-    n<-0
-    name<-c()
-    for(i in seq(length(t(data)))){
-        if(  ">" %in% strsplit(as.character(data[i,]),"")[[1]])
-            {if (! n==0){out<-append(out,list(matrix(box,dim(box))))}
-             box<-c()
-             name<-c(name,strsplit(as.character(data[i,]),"\t")[[1]][1])
-             n<-n+1}
-        else{
-            box<-rbind(box,(as.numeric(unlist(strsplit(as.character(data[i,]),"\t")))))}}
-    cbind(name=name,data=append(out,list(matrix(box,dim(box)))))}
-
-
-
-loadData<-function(fileLocation){
-    data<-unlist(read.delim(fileLocation,skip=1,header=FALSE,sep="\n"))
-    out<-list()
-    n<-0
-    name<-c()
-    for(i in seq(length(data))){
-        d<-unlist(strsplit(as.character(data[i])," "))
-        if( ">"==unlist(strsplit(as.character(data[i]),""))[1])
-            {if (! n==0){out<-append(out,list(t(matrix(box,dim(box)))))}
-
-             box<-c()
-             name<-c(name,d[1])
-             n<-n+1}
-        else{
-            l<-length(d)
-            box<-rbind(box,as.numeric(d[seq(3,l-1)]))}}
-    cbind(name=name,data=append(out,list(t(matrix(box,dim(box))))))}
-
-
-
-palindrome<-function(data){
-    makePWM(t(apply(apply(data@pwm,2,rev),1,rev)))}
-
+#' @export
 getScore<-function(pScore,motif,name){
     as.numeric(unlist(pScore[name]))[which(as.character(pScore$motif)==motif)[1]]}
 
+#' @export
 imageList<-function(fileLocation,sets,x,shortNames,imageDirectory,front="motif_"){
     data<-loadData(paste(fileLocation,sets[x],sep=""))
     name<-shortNames[x]
     apply(data,1,function(x){htmlImage(paste(imageDirectory,front,name,"_",strsplit(x[1]$name,">")[[1]][2],".png",sep=""),"style","width:101px;height:50px")})}
 
+#' @export
 scoreList<-function(i,fileLocation,sets,j,shortNames,pScoreFile){
     data<-read.delim(pScoreFile)
     print(length(data))
@@ -87,9 +43,11 @@ scoreList<-function(i,fileLocation,sets,j,shortNames,pScoreFile){
     data<-loadData(paste(fileLocation,sets[j],sep=""))
     apply(data,1,function(x){getScore(pScore,x[1]$name,shortNames[i])})}
 
+#' @export
 getMotifs<-function(data){
     apply(data,1,function(x){strsplit(x$name,">")[[1]][2]})}
 
+#' @export
 prepareTable<-function(loadData,shortNames,fileLocation,sets,pScoreFile,n,x){
     temp<-sapply(seq(n),scoreList,fileLocation,sets,x,shortNames,pScoreFile)
     apply(
@@ -98,9 +56,11 @@ prepareTable<-function(loadData,shortNames,fileLocation,sets,pScoreFile,n,x){
             temp),
         1,function(x){htmlTable(matrix(collapse(as.character(x))),anotations=buildAnotations("style","font-size:10px"))})}
 
+#' @export
 getFrameChar<-function(lis,val){
     as.character(lis[val][[1]])}
 
+#' @export
 sequenceGen<-function(... ,fn, shortNames,n=3){
     I<-lapply(seq(n),function(x) {fn( x=x,shortNames=shortNames,...)})
     ma<-max(sapply(I,length))
@@ -109,7 +69,10 @@ sequenceGen<-function(... ,fn, shortNames,n=3){
     colnames(I)<-shortNames
     I}
 
-printFasta<-function(fileLocation,sets,shortNames,imageDirectory)
+#' @export
+printFasta<-function(fileLocation,sets,shortNames,imageDirectory){
+    palindrome<-function(data){
+        makePWM(t(apply(apply(data@pwm,2,rev),1,rev)))}
     for(j in seq(length(sets))){
         data<-loadData(paste(fileLocation,sets[j],sep=""))
         a<-lapply(seq(length(data[,1])), function(i){makePWM(t(as.matrix(data[i,2]$data)))})
@@ -121,8 +84,12 @@ printFasta<-function(fileLocation,sets,shortNames,imageDirectory)
             dev.off()
             png(paste(imageDirectory,"motif_",name,"_",motif,".png",sep=""))
             seqLogo(a[[i]],ic.scale=TRUE,xaxis=FALSE,yaxis=FALSE)
-            dev.off()}}
+            dev.off()
+        }
+    }
+}
 
+#' @export
 htmlGenerateMain<-function(fileLocation,sets,shortNames,imageDirectory,n=3,pScoreFile){
     I<-sequenceGen(fn=imageList,n=n,shortNames=shortNames,fileLocation,sets,imageDirectory)
     IP<-sequenceGen(fn=imageList,n=n,shortNames=shortNames,fileLocation,sets,imageDirectory,front="motif_p_")
@@ -169,4 +136,3 @@ htmlGenerateHelp <- function(){
 #           ,outFile)})}
 # 
 # main()
-

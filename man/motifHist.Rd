@@ -4,7 +4,8 @@
 \alias{motifHist}
 \title{Motif histogram}
 \usage{
-motifHist(data, mList, cList, locationsM, locationsC, n1, n2, reg)
+motifHist(data, mList, cList, locationsM, locationsC, n1, n2, reg,
+  width = c(-30, 30))
 }
 \description{
 Motif histogram

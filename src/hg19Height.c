@@ -142,7 +142,25 @@ void read_bed(char ** filename,char ** chrom,int *start, int *end)
   fclose(f);
 }
 
-
+/*
+void main(int argc,char **argv){
+  char * bedfilename=argv[1];
+  char * rawfilename=argv[1];
+  int * start;
+  int * end;
+  char ** chrom;
+  int *scores;
+  int length;
+  int i;
+  file_length(bedfilename,&length);
+  read_bed(bedfilename,chrom,start,end);
+  pileup(rawfilename,chro,start,end,peaknum,scores);
+  for(i=0;i<length;i++){
+    printf("%c\t%d\t%d\t%d",chrom[i],start[i],end[i],scores[i]);
+  }
+    
+}
+*/
 void R_init_myLib(DllInfo *info)
 {
 R_registerRoutines(info,cMethods,NULL,NULL,NULL);

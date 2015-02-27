@@ -25,7 +25,8 @@ qn <-function(data){
     apply(reverseSequence,2,function(x) ranks[x])}
 
 #' @export
-standPCAPrep <-function(data,v){
+#' 
+standPCAPrep <-function(data,v="colQn"){
   switch(v,
          rowSumOne=t(apply(data,1, function(x) {x/sum(x)})),
          colSumOne=apply(data,2, function(x) x/sum(x)),
@@ -49,7 +50,6 @@ plotHist<-function(pcs,pos){
   x<-pcs$rotation[,pos] * pcs$sdev[pos]
   hist(x,1000)}
 
-
 plotBox<-function(pcs,pos,data,cats){
   x<-t(as.matrix(pcs$rotation)) %*% as.matrix(data)
   d<-data.frame(x[pos,],row.names=cats)
@@ -58,7 +58,10 @@ plotBox<-function(pcs,pos,data,cats){
 
 #' @export
 plotPCs<-function(pcs,pos,data,cats,lab=c("xlabel","ylable","Title")){
-    x<-t(as.matrix(pcs$rotation)) %*% as.matrix(data)
+    if("rotation" %in% names(pcs))
+        x<-t(as.matrix(pcs$rotation)) %*% as.matrix(data)
+    else
+        x<-t(as.matrix(pcs)) %*% as.matrix(data)
     d1<-data.frame(x[pos[1],])
     d2<-data.frame(x[pos[2],])
     plot(t(d1),t(d2),xlab=lab[1],ylab=lab[2])
@@ -202,7 +205,7 @@ ascore<-function(heightFile,pc,funs=rep("value",length(pc)),ns=rep(0,length(pc))
     else if(is.data.frame(heightFile))
         data<-as.matrix(heightFile)
     else if(! is.matrix(heightFile))
-        stop("heightFile must be either a filename data.frame or matrix.")                
+        stop("heightFile must be either a filename data.frame or matrix.")
     normData<-standPCAPrep(data,normMethod)
     pcs=prcomp(t(normData))
     batchscore(pcs,pc,funs,ns)}
@@ -226,6 +229,8 @@ pcaAnalysisTest<- function(pc1=1, pc2=3)
     batch<-batchscore(pcs,c(1,3),c("top","top"),c(3,3))
     print(str(batch))
     length(which(apply(batch,2,all)==TRUE))
+    pc1=1
+    pc2=3
     #length(which(ascoreSeperation(vect,{x<m-sd*3})==TRUE))
     #plotPCs(pcs,cbind(pc1,pc2),normData,cats,c( paste("PC:",as.character(pc1),sep="" ),paste("PC:",as.character(pc2),sep="" ),mock[i]))}
 }

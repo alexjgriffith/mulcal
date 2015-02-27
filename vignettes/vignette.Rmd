@@ -1,0 +1,4 @@
+%\VignetteEngine{knitr::knitr} 
+%\VignetteIndexEntry{Intro to mulcal} 
+library(mulcul)
+

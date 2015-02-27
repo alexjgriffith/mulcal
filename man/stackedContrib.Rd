@@ -9,7 +9,7 @@
 \usage{
 stackedContrib(data, catagories, swCat = catagories, steps = 40, n = 10,
   f = c(function(x) {     mean(x) + sqrt(var(x)) * n }, function(x) {    
-  mean(x) - sqrt(var(x)) * n }))
+  mean(x) - sqrt(var(x)) * n }), sum = FALSE)
 }
 \description{
 Stacked Contribution
@@ -24,6 +24,7 @@ pcs<-as.matrix(mulcal::ascore(data,c(1:10)))
 
 
 swCat<-c("normal","normal","abnormal","abnormal","abnormal","abnormal","abnormal","abnormal","meka","ecfc","stem","stem")
+swCat<-c("Erythroid","K562","Jurkat","CEM","RPMI","Prima5(Brand)","Prima2","Prima5","Megakaryocite","ECFC","CD133","CD34")
 names(swCat)<-c("eryt","k562","jurk","cem","rpmi","tall_p1","tall_p2","tall_p3","meka","ecfc","cd133","cd34")
 tSwCat<-as.character(unlist(lapply(catagories,function(x) swCat[x])))
 stackedContrib(pcs[,1],catagories)

@@ -2,3 +2,5 @@ temp.prof
 .o
 .so
 .Rhistory
+inst/lib
+inst/data
