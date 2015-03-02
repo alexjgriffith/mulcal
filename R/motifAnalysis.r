@@ -15,9 +15,9 @@
 #' Score List
 #'
 #' The preliminary investigation score mechanism
-#' 
+#' scoreList(lapply(h,function(x) lapply(x,function(y)y[[2]])),mots,addmotifs)
 #' @export
-scoreList<-function(h,motifs,addmotifs){
+scoreList<-function(k,mot,addmotifs){
     which(unlist(mapply(function(k,mot){
         if(length(k)>0){
             t0<-unlist(lapply(seq(min(k),max(k)),function(i)length(which(k==i))))
@@ -38,7 +38,8 @@ scoreList<-function(h,motifs,addmotifs){
 #' Prelim socre function
 #' 
 #' @export
-motifScoreFunction<-function(x) {length(x)*2^(-max(x)/sqrt(var(x)))}
+motifScoreFunction<-function(x) {
+                                 if(var(x)==0){ 0} else {t0<-getHeights(x);length(t0)*2^(-max(t0)/sqrt(var(t0)))}}
 
 #' Get Heights
 #'
@@ -61,9 +62,6 @@ geometricScore<-function(h){
     plot(unlist(lapply(t0,test,p))*t1)
     plot(unlist(t0)*t1)
 }
-
-
-#################################3
 
 #' Intersect Count
 #'
@@ -135,7 +133,7 @@ motifs2View<-function(m1,m2,reg,Sequences){
 #' 
 #' h<-lapply(seq(10),function(k)lapply(seq(10),function(i)lapply(seq(3),function(j)motifHist(Sequences,mList,cList,locationsM,locationsC,i,k,reg[,j]))))
 #' lapply(h,scoreList,c(mots,addmotifs)[1:10],addmotifs)
-#' histWrapper(h,c(3,6,7),5,mots)
+#' histWrapper(lapply(h,function(x) lapply(x,function(y)y[[2]])),c(mots,addmotifs), names=c("NonName"),c(1),c(30))
 histWrapper<-function(h,motifNames,names=c("NoName"),...){
     BuildernestedList<-function(h,locs){
         fun<-function(i,h,...){NULL}

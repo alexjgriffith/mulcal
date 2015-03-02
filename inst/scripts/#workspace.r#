@@ -4,11 +4,11 @@ FastaFile<-"~/Dropbox/UTX-Alex/jan/combined.fasta"
 Sequences <- readDNAStringSet(FastaFile, "fasta")
 motifs<-rbind(loadPWM("inst/data/abnormal_normal.pwm"),loadPWM("inst/data/normal_abnormal.pwm"),loadPWM("inst/data/jaspar_motifs.txt","jaspar"))
 mots<-unlist(lapply(unlist(motifs[,1]),function(x)gsub(">","",x)))
-addmotifs<-c("CANNGT","TACCTC")
+addmotifs<-c("CANNTG","TACCTC","GATAAG")
 
 n=10
 m=3
-mots<-c(mots[1:(n-length(addmotifs)]),addmotifs)
+mots<-c(mots[1:(n-length(addmotifs))],addmotifs)
 mList<-unlist(lapply(c(mots,addmotifs),IUPACtoBase))
 cList<-unlist(lapply(lapply(c(mots,addmotifs),IUPACtoBase),compliment))
 locationsM<-lapply(mList,grep,Sequences)
@@ -17,7 +17,23 @@ locationsC<-lapply(cList,grep,Sequences)
 h<-lapply(seq(n),function(k)lapply(seq(n),function(i)lapply(seq(m),function(j)motifHist(Sequences,mList,cList,locationsM,locationsC,i,k,reg[,j]))))
 
 
+scores<-lapply(seq(m),
+       function(m){
+           v<-apply(combn(n,2),2,function(x) motifScoreFunction(h[[x[1]]][[x[2]]][[m]]))
+y<-matrix(0,n,n)
+y[upper.tri(y)]<-v
+y[lower.tri(y)]<-v
+colnames(y)<-mots
+rownames(y)<-mots
+y})
+
 
 scores<-lapply(seq(m),
-       function(n)
-           matrix(unlist(lapply(h,function(x) lapply(x,function(y)motifScoreFunction(y[[n]]) ))),nrow=10))
+       function(n){
+           ma<-matrix(unlist(lapply(h,function(x) lapply(x,function(y)motifScoreFunction(y[[n]]) ))),nrow=10)
+           colnames(ma)<-mots
+           rownames(ma)<-mots
+       ma})
+
+
+
