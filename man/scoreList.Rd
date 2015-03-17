@@ -4,9 +4,10 @@
 \alias{scoreList}
 \title{Score List}
 \usage{
-scoreList(h, motifs, addmotifs)
+scoreList(k, mot, addmotifs)
 }
 \description{
 The preliminary investigation score mechanism
+scoreList(lapply(h,function(x) lapply(x,function(y)y[[2]])),mots,addmotifs)
 }
 

@@ -4,7 +4,7 @@
 \alias{motifs2View}
 \title{Motifs Two View}
 \usage{
-motifs2View(m1, m2, reg, Sequences)
+motifs2View(m1, m2, reg, Sequences, nearHeights = FALSE)
 }
 \description{
 Visualize the similarity between two motifs,

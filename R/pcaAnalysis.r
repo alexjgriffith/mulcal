@@ -9,12 +9,16 @@
 #
 
 #' @export
-loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed"){  
+loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed",n=3,norm=TRUE){  
   cdata<-read.table(file)
-  stats<-cdata[c(1,2,3)]
+  stats<-cdata[seq(n)]
   l=length(cdata)
+  if(norm==TRUE)
+      data<-as.matrix(apply(cdata[(n+1):l],2, function(x) as.vector((unlist(x/(stats[3]-stats[2]))))))
+  else
+      data<-as.matrix(apply(cdata[(n+1):l],2, function(x) as.vector((unlist(x)))))
   list(stats=as.matrix(stats),
-            data=as.matrix(apply(cdata[4:l],2, function(x) as.vector((unlist(x/(stats[3]-stats[2])))))))}
+            data=data)}
 
 #' @export
 qn <-function(data){

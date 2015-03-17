@@ -5,7 +5,7 @@
 \title{Homer Wrapper}
 \usage{
 homerWrapper(sequences, foreground, background, homerLocation,
-  motifsFile = FALSE, opts = "-len 6,7,8,9")
+  motifsFile = FALSE, opts = "-S 5 -len 6")
 }
 \description{
 This is only a wrapper for the DENOVO functionality of homer2, homer must be installed on the system before this can be used.

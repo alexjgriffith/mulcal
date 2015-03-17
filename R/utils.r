@@ -7,6 +7,22 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 
+#' @export
+cdf<-function(x,range){
+    x<-abs(m)    
+    out<-c(x[1])
+    for(i in seq(length(x)-1))
+        out<-c(out,out[i]+x[i+1])
+    out     
+}
+
+#' @export
+pdf<-function(x){
+ l<-length(x)
+ x[2:(l-0)]-x[1:(l-1)]
+}
+
+
 # aux.r -> utils.r
 #' @export
 collapse<-function(...,sep=""){paste(...,sep=sep)}

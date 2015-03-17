@@ -32,6 +32,6 @@ h<-lapply(seq(3),function(k)lapply(seq(1:l-1),function(i)motifHist(Sequences,mLi
 
 h<-lapply(seq(10),function(k)lapply(seq(10),function(i)lapply(seq(3),function(j)motifHist(Sequences,mList,cList,locationsM,locationsC,i,k,reg[,j]))))
 lapply(h,scoreList,c(mots,addmotifs)[1:10],addmotifs)
-histWrapper(h,c(3,6,7),5,mots)
+histWrapper(lapply(h,function(x) lapply(x,function(y)y[[2]])),c(mots,addmotifs), names=c("NonName"),c(1),c(30))
 }
 

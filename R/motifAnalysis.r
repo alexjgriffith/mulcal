@@ -39,15 +39,20 @@ scoreList<-function(k,mot,addmotifs){
 #' 
 #' @export
 motifScoreFunction<-function(x) {
-                                 if(var(x)==0){ 0} else {t0<-getHeights(x);length(t0)*2^(-max(t0)/sqrt(var(t0)))}}
+    if (length(x)<2){return(0)} else{ if(var(x)==0){ 0} else {t0<-getHeights(x);length(t0)*2^(-max(t0)/sqrt(var(t0)))}}}
 
 #' Get Heights
 #'
 #' Get the heights of the motif comparison data
 #'
 #' @export
-getHeights<-function(h)
-    unlist(lapply(seq(min(h),max(h)),function(i)length(which(h==i))))
+getHeights<-function(h,range=c(min(h),max(h))){
+    rep<-rep(0,(range[2]-range[1]+1))
+    for(i in h)
+        rep[i-range[1]+1]<-rep[i-range[1]+1]+1
+    rep
+}
+    #unlist(lapply(range,function(i)length(which(h==i))))}
 
 #' geometric score value
 #'
@@ -93,16 +98,19 @@ length(
 #' m<-motifs2View("CANNTG","TGACCT",reg[,3],Sequences)
 #' k<-motifs2View("CANNTG","GATAAG",reg[,1],Sequences)
 #' t0<-unlist(lapply(seq(min(k),max(k)),function(i)length(which(k==i))))
-motifs2View<-function(m1,m2,reg,Sequences){
+motifs2View<-function(m1,m2,reg,Sequences,nearHeights=FALSE){
     m12<-c(m1, m2)
     mList<-unlist(lapply(m12,IUPACtoBase))
     cList<-lapply(unlist(lapply(m12,IUPACtoBase)),compliment)
     locationsM<-lapply(mList,grep,Sequences)
     locationsC<-lapply(cList,grep,Sequences)
+    if(nearHeights==FALSE){
     h<-list(motifHist(Sequences,mList,cList,locationsM,locationsC,1,2,reg))
     histVisualize(h,m1,m2)
     h<-unlist(h)
-    t0<-unlist(lapply(seq(min(h),max(h)),function(i)length(which(h==i))))
+    t0<-unlist(lapply(seq(min(h),max(h)),function(i)length(which(h==i))))}
+    else{
+        h<-nearSummit(Sequences,mList,cList,locationsM,locationsC,1,reg)}
     #c((max(t0)-mean(t0))/sqrt(var(t0)),scoreFunction(t0))
     h
 }
@@ -145,7 +153,7 @@ histWrapper<-function(h,motifNames,names=c("NoName"),...){
             subset.nestedList(h,locs,fun,...)}
     }
     D2<-BuildernestedList(h,list(...))
-    vals<-D2(expression(h[[i[1]]][[i[2]]]))
+    vals<-D2(expression(h[[i[1]]][[i[2]]][[i[3]]]))
     mot<-D2(function(i,h,motifNames) motifNames[i],motifNames=motifNames)
     motx<-Map(function(x)x[1],mot)
     moty<-Map(function(x)x[2],mot)
@@ -259,7 +267,7 @@ motifTest<-function(fastaFile="~/Dropbox/UTX-Alex/jan/combined.fasta",
 
 
 #'@export
-nearSummit<-function(data,mList,Clist,locationsM,locatoinsC,n1,reg,width=150)
+nearSummit<-function(data,mList,cList,locationsM,locationsC,n1,reg,width=150)
     {
     lM<-intersect(locationsM[[n1]],which(reg))
     lC<-intersect(locationsC[[n1]],which(reg))
@@ -291,7 +299,7 @@ getDistance<-function(x,y){
 #' This is only a wrapper for the DENOVO functionality of homer2, homer must be installed on the system before this can be used.
 #' 
 #' @export
-homerWrapper<-function(sequences,foreground,background,homerLocation,motifsFile=FALSE,opts="-len 6,7,8,9"){
+homerWrapper<-function(sequences,foreground,background,homerLocation,motifsFile=FALSE,opts="-S 5 -len 6"){
     treatmentFile<-tempfile()
     controlFile<-tempfile()
     if (!is.character(motifsFile))
@@ -422,6 +430,16 @@ heightHist<-function(t0,xlab="Histogram"){
 locHist<-function(t0,xlab="Histogram",limits=c(-32,32)){
     x<-seq(min(t0),max(t0))
     t1<-unlist(lapply(x,function(x)length(which(x==t0))))
+    locHist2(t1,x,xlab,limits)
+    #p<-qplot(x,t1,geom="step",ylab="frequency",xlab=xlab)+stat_function(fun=function(x){0})#+xlim(limits)
+    #n<-4
+    #m<-ceiling(log2(abs(limits[2]-limits[1])/2))
+    #s<-seq(max(m-3,1),m)
+    #b<-c(-sapply(s,function(x)2^x),sapply(s,function(x)2^x))
+    #p+scale_x_continuous(breaks=b,limits=limits)
+}
+
+locHist2<-function(t1,x,xlab="Histogram",limits=c(-32,32)){
     p<-qplot(x,t1,geom="step",ylab="frequency",xlab=xlab)+stat_function(fun=function(x){0})#+xlim(limits)
     n<-4
     m<-ceiling(log2(abs(limits[2]-limits[1])/2))

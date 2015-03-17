@@ -4,7 +4,7 @@
 \alias{getHeights}
 \title{Get Heights}
 \usage{
-getHeights(h)
+getHeights(h, range = c(min(h), max(h)))
 }
 \description{
 Get the heights of the motif comparison data
