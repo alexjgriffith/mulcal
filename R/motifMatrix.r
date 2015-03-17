@@ -45,6 +45,10 @@ partialSigMatrix<-function(Sequences,mots,reg,
              temp<-temp+1
      }
     }
+    if(temp!=0){
+        print("saving")             
+        saveData(filename,mode="perMot2",append=append,h,m1,m2,fields,ranges)
+    }
     h<-read.table(filename,header=TRUE,check.names = FALSE)
     h
 }
