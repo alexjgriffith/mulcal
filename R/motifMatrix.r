@@ -3,6 +3,7 @@
 # motif_1-motif_2-enviroment
 # option to save every x motif_2
 
+#' @export
 partialSigMatrix<-function(Sequences,mots,reg,
                            fields=unlist(Map(as.character,1:dim(reg)[2])),
                            addmotifs=c(),
@@ -48,15 +49,18 @@ partialSigMatrix<-function(Sequences,mots,reg,
     h
 }
 
+#' @export
 anotatePaste<-function(anot,value,start="#$"){
     paste(c(paste(c(start,anot),collapse=""),value),collapse=" ")
 }
-       
+
+#' @export
 flattenHeights<-function(h,range=range(unlist(h))){
        x<-range#do.call(seq,as.list(range))
        do.call(rbind,lapply(h,function(y1) do.call(rbind,lapply(y1,function(y) do.call(rbind,lapply(y,getHeights,x))))))}
        #do.call(rbind,lapply(h,function(y1) do.call(rbind,lapply(y1,function(y) do.call(rbind,lapply(y,"+",x))))))}
 
+#' @export
 saveData<-function(filename,mode=FALSE,append=FALSE,...){
     generateHeader<-function(mots,fields,ranges){
         c(anotatePaste("fields",fields),
@@ -105,7 +109,8 @@ saveData<-function(filename,mode=FALSE,append=FALSE,...){
                      col.names=col.names,
                      quote=quote,
                      append=append))}
-           
+
+#' @export
 loadData<-function(filename){    
     a<-unlist(as.character(read.delim(filename,header=FALSE,comment.char="")[,1]))
     coms<-strsplit(a[grep("#",a)]," ")
