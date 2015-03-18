@@ -4,7 +4,7 @@
 # option to save every x motif_2
 
 #' @export
-partialSigMatrix<-function(Sequences,mots,reg,
+partialSigMatrix<-function(Sequences,mots,reg,ranges,
                            fields=unlist(Map(as.character,1:dim(reg)[2])),
                            addmotifs=c(),
                            n=rep((length(mots)+length(addmotifs)),2),
@@ -22,7 +22,7 @@ partialSigMatrix<-function(Sequences,mots,reg,
     # may be parralized easily.
     temp<-0
     h<-list()
-    bp<-20
+    bp<-4
     m1<-c()
     m2<-c()
     append=FALSE
@@ -98,21 +98,23 @@ saveData<-function(filename,mode=FALSE,append=FALSE,...){
     f<-list(row.names=FALSE,
             col.names=FALSE,
             quote=FALSE)
-    t<-list(row.names=TRUE,
+    n<-list(row.names=TRUE,
             col.names=(! append),
-            quote=FALSE)
+            quote=FALSE)    
     output<-switch(mode,
                    body=append(list(data=generateData(...)),f),
                    head=append(list(data=generateHeader(...)),f),
                    all=append(list(data=generateAll(...)),f),
-                   perMot=append(list(data=perMot1(...)),t),
-                   perMot2=append(list(data=perMot2(...)),t))
+                   perMot=append(list(data=perMot1(...)),n),
+                   perMot2=append(list(data=perMot2(...)),n))
     with(output,
          write.table(data,filename,
                      row.names=row.names,
                      col.names=col.names,
                      quote=quote,
-                     append=append))}
+                     append=append)
+         )
+}
 
 #' @export
 loadData<-function(filename){    
