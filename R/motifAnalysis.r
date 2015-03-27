@@ -439,6 +439,7 @@ locHist<-function(t0,xlab="Histogram",limits=c(-32,32)){
     #p+scale_x_continuous(breaks=b,limits=limits)
 }
 
+#' @export
 locHist2<-function(t1,x,xlab="Histogram",limits=c(-32,32)){
     p<-qplot(x,t1,geom="step",ylab="frequency",xlab=xlab)+stat_function(fun=function(x){0})#+xlim(limits)
     n<-4

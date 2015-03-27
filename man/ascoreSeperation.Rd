@@ -2,7 +2,8 @@
 % Please edit documentation in R/pcaAnalysis.r
 \name{ascoreSeperation}
 \alias{ascoreSeperation}
-\title{The Processing of PC values}
+\title{The Processing of PC values
+A utility designed to help seperate a vector based on the mean and standard deviation of the data. For the most part ascoreSeparation will return a vector of logicals but funs such as "value" and "rank" return numerics.}
 \source{
 \url{https://github.com/alexjgriffith/mulcal}
 }
@@ -13,8 +14,6 @@ ascoreSeperation(vect, fun, n = 1)
 \item{vect}{A vector of numerical values.}
 
 \item{fun}{A function which is used to sepearate memebers of the vector.
-
-
 \describe{
 \item{\strong{"top"}}{TRUE if greater than mean + n* standard deviation.}
 \item{\strong{"bottom"}}{TRUE if less than mean - n* standard deviation.}
@@ -31,6 +30,7 @@ ascoreSeperation(vect, fun, n = 1)
 A vector of equal length to the parameter vect.
 }
 \description{
+The Processing of PC values
 A utility designed to help seperate a vector based on the mean and standard deviation of the data. For the most part ascoreSeparation will return a vector of logicals but funs such as "value" and "rank" return numerics.
 }
 \author{

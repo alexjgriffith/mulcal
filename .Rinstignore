@@ -1,3 +1,5 @@
 /.git
 /.gitignore
 .o
+inst
+data

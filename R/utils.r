@@ -8,7 +8,7 @@
 # Contact: griffitaj@gmail.com
 
 #' @export
-cdf<-function(x,range){
+cdf<-function(m,range){
     x<-abs(m)    
     out<-c(x[1])
     for(i in seq(length(x)-1))

@@ -82,7 +82,6 @@ interClass<-function(pca,data,pos,C=3,r=13){
   data.frame(data=unlist(lapply(seq(r),function(x) mean(data[G,x])/mean(data[S,x]))),row.names=cats)}
 
 #' Principle Componenet Analysis
-#'
 #' @export
 #' @examples
 #'    peakFile <- "sorted_peaks.bed"
@@ -107,14 +106,10 @@ ascoreWeighting<-function(pcs,scores,weights){
     t(matrix(weights))%*%t(as.matrix(pcs$rotation[,scores]))}
 
 #' The Processing of PC values
-#'
 #' A utility designed to help seperate a vector based on the mean and standard deviation of the data. For the most part ascoreSeparation will return a vector of logicals but funs such as "value" and "rank" return numerics.
-#' 
 #' @template authorTemplate
 #' @param vect A vector of numerical values.
-#' @param fun A function which is used to sepearate memebers of the vector.
-#'
-#' 
+#' @param fun A function which is used to sepearate memebers of the vector. 
 #' \describe{
 #' \item{\strong{"top"}}{TRUE if greater than mean + n* standard deviation.}
 #' \item{\strong{"bottom"}}{TRUE if less than mean - n* standard deviation.}
@@ -147,13 +142,10 @@ ascoreSeperation<-function(vect,fun,n=1){
 
 
 #' Batch alpha score seperation
-#'
 #' Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.
-#'
 #' @seealso \code{\link{ascoreSeperation}}
 #' @seealso \code{\link{ascore}}
-#' @export
-#' 
+#' @export 
 batchscore<-function(pcs,scores,funs,ns){
     mapply(function(x,y,z){ascoreSeperation(pcs$rotation[,x],y,z)},
            scores,funs,ns)    }

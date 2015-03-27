@@ -2,11 +2,13 @@
 % Please edit documentation in R/pcaAnalysis.r
 \name{batchscore}
 \alias{batchscore}
-\title{Batch alpha score seperation}
+\title{Batch alpha score seperation
+Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.}
 \usage{
 batchscore(pcs, scores, funs, ns)
 }
 \description{
+Batch alpha score seperation
 Apply a serise of options to ascoreSeperation and return a matrix. Used by \code{\link{ascore()}}.
 }
 \seealso{
