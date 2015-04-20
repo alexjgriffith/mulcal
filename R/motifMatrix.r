@@ -1,8 +1,19 @@
-# The portions of saving, motif hist and sigMatrix required to
-# save the data in chunks
-# motif_1-motif_2-enviroment
-# option to save every x motif_2
+#!/usr/bin/env R
+#
+# This file is part of peakAnalysis,
+# http://github.com/alexjgriffith/alpha-score/, 
+# and is Copyright (C) University of Ottawa, 2015. It is Licensed under 
+# the three-clause BSD License; see LICENSE.txt.
+# Author : Alexander Griffith
+# Contact: griffitaj@gmail.com
+#
 
+#' PartialSigMatrix
+#' 
+#' The portions of saving, motif hist and sigMatrix required to
+#' save the data in chunks
+#' motif_1-motif_2-enviroment
+#' option to save every x motif_2
 #' @export
 partialSigMatrix<-function(Sequences,mots,reg,ranges,
                            fields=unlist(Map(as.character,1:dim(reg)[2])),

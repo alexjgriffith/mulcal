@@ -29,12 +29,11 @@ exonsfromGenome<-function(genome,chroms=c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16
     exons[as.character(exons[,1]) %in% chroms,]
     }
 
+# work in progress
 rnaSeqAnalysis<-function(){
     geneomes<-read.table("inst/data/hg19.RefSeqGenes.csv",header=TRUE,comment.char = "")
     vals<-loadHeightFile("inst/data/rna_heights3.bed",n=4)
     cats<-read.table("inst/data/rna_cats")
-
-
     data<-do.call(rbind,mapply(function(genes,chro){
         levs<-as.character(genes)
         reg1<-vals$stats[,1]==chro

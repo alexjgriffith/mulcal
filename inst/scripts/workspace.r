@@ -1,3 +1,283 @@
+library(mulcal)
+library(grid)
+library(Biostrings)
+library(ggplot2)
+library(data.table)
+
+
+findLocations<-function(ml,Sequences,subset=seq(length(Sequences))){    
+        subset[grep(ml,Sequences[subset])]
+}
+
+combineCombinations<-function(m1,m2,Sequences,reg){
+    l1<-findLocations(m1,Sequences,which(reg))
+    findLocations(m2,Sequences,l1)}
+
+singleCombinations<-function(m1,Sequences,reg)
+    findLocations(m1,Sequences,which(reg))
+
+
+complimentLocations<-function(m1,m2,Sequences,reg){
+    ml<-unlist(lapply(c(m1,m2),IUPACtoBase))
+    cl<-unlist(lapply(ml,compliment))
+    l2<-combineCombinations(ml[1],ml[2],Sequences,reg)
+    l4<-combineCombinations(cl[1],cl[2],Sequences,reg)
+    sort(union(l2,l4))
+}
+
+getMembers<-function(m1,Sequences){
+        mL1<-IUPACtoBase(m1)
+        cL1<-paste(mL1,compliment(mL1),sep="|")
+        gregexpr(cL1,Sequences)}
+
+getDistanceWrap<-function(m1,m2,Sequences){
+    getDistance(getMembers(m1,Sequences),getMembers(m2,Sequences))
+}
+
+slowDist<-function(m1,m2,Sequences,reg){
+    l5<-complimentLocations(m1,m2,Sequences,reg)
+    getDistanceWrap(m1,m2,Sequences[l5])}
+
+slowIndv<-function(m1,Sequences,reg){
+    l2<-sort(union(singleCombinations(IUPACtoBase(m1),Sequences,reg),singleCombinations(compliment(IUPACtoBase(m1)),Sequences,reg)))
+    mL1<-IUPACtoBase(m1)
+    cL1<-paste(mL1,compliment(mL1),sep="|")
+    unlist(lapply(gregexpr(cL1,Sequences[l2]),as.numeric))}
+
+
+jointDist<-function(m1,m2,Sequences,reg){
+    lM<-complimentLocations(m1,m2,Sequences,reg)
+    tbM<-list(getMembers(m1,Sequences[lM]),getMembers(m2,Sequences[lM]))
+    val1<-do.call(rbind,Map(function(x,y){
+        x<-unlist(x)
+        y<-unlist(y)
+        c<-length(x)*length(y)
+        a<-c/length(x)
+        b<-c/length(y)
+        cbind(unlist(lapply(x,function(x)rep(x,a))),rep(y,b))},
+                            tbM[[1]],tbM[[2]]))
+}
+
+rotation<-function(val1){
+    val2<-val1%*%matrix(c(-1,1,0,0),ncol=2)
+    val3<-val1%*%matrix(c(1,1,0,0),ncol=2)   
+    cbind(val2[,1],val3[,1])}
+
+projectDiff<-function(val1P){
+    getHeights(val1P[,1],c(-300,300))-getHeights(val1P[,2],c(0,600))
+}
+
+windowProjectDiff<-function(y,m1,m2,fun,window=10){
+    #a<-floorWidth(getHeights(y[,1],c(-300,300)),seq(-300,300),-nchar(m1),nchar(m2))
+    a<-getHeights(y[,1],c(-300,300))
+    a1<-a[(301+nchar(m2)):600]
+    a2<-a[1:(300-nchar(m1))]
+    b<-getHeights(y[,2],c(0,600))
+    b1<-b[(301+nchar(m2)):600]
+    b2<-b[1:(300-nchar(m1))]
+    aP<-c(rev(windowing(rev(a2),fun,window,sliding=TRUE)),
+          windowing(a1,fun,window,sliding=TRUE))
+    bP<-c(rev(windowing(rev(b2),fun,window,sliding=TRUE)),
+          windowing(b1,fun,window,sliding=TRUE))    
+    cbind(bP,aP)
+}
+
+floorFunction<-function(fun,m1,m2,Sequences,reg,pass=FALSE){
+    y<-fun(m1,m2,Sequences,reg)
+    if(! pass)
+        floorWidth( y,seq(-300,300),-nchar(m1),nchar(m2))
+    else
+        y
+}
+
+
+
+lapply(mots[1:10], function(x){cor(windowProjectDiff(rotation(jointDist(x,m2,Sequences,reg[,1])),m1,m2))[[2]]^2})
+
+m2<-mots[301]
+
+for(x in mots[1:20]){
+    y<-rotation(jointDist(x,m2,Sequences,reg[,1]))
+    v<-windowProjectDiff(y,m1,m2,fun="var",window=5)
+    fit<-lm(y~x,data.frame(y=v[,2],x=v[,1]))
+    c<-coefficients(fit)
+    x=seq(length(v[,1]))/length(v[,1])*max(v[,1])
+    l<-data.frame(x=x,y=x*c[2]+c[1])
+    par(mfrow=c(2,2))
+    plot(v)
+    lines(l)    
+    #plot(v[,2]/l$y)
+    #plot((v[,2]-l$y[order(v[,1])])/l$y[order(v[,1])])
+    #plot((v[,2][order(v[,1])]/l$y))
+    plot(unlist(lapply(v[,2],function(x)max(0.01,x)))/unlist(lapply(v[,1],function(x)max(0.01,x))))
+    plot(seq(-300,300),floorWidth(getHeights(y[,1],c(-300,300)),seq(-300,300),-nchar(m1),nchar(m2)) )
+    plot(seq(0,600),getHeights(y[,2],c(0,600)))
+    readKey()
+}
+
+fit<-lm(y~x,data.frame(y=v[,2],x=v[,1]))
+
+
+plot(getHeights(jointDist(m1,m2,Sequences,reg[,1])%*%matrix(c(0,1,0,1),ncol=2)[,1] ) )
+
+plot(floorFunction( function(...)projectDiff(rotation(jointDist(...))),m1,m2,Sequences,reg[,1]))
+
+
+y<-slowDist(m1,m2,Sequences,reg[,1])
+a<-floorWidth( getHeights(y,c(-300,300)),seq(-300,300),-nchar(m1),nchar(m2))
+plot(a)
+
+
+rev(order(getHeights(a))+min(a))[1:10]
+
+m1<-"GATAAG"
+#m1<-"KNWVNAN"
+m2<-"CANNTG"
+
+m1<-mots[runif(1,1,302)]
+m2<-mots[runif(1,1,302)]
+
+y<-projectDiff(m2,m1,Sequences,reg[,1])
+plot(y[,1],y[,2])
+a<-floorWidth( getHeights(y[,1],c(-300,300))-getHeights(y[,2],c(1,601)),seq(-300,300),-nchar(m1),nchar(m2))
+var<-distributionT(data.frame(x=seq(1:300),y=rep(1/601,300)))*var(a)*601
+#plot(-log10(dnorm(a,mean(a),sqrt(var))))
+
+
+
+plot(windowing(a,function(x) var(x),50))
+lines(var[25:(length(var)-25)])
+
+plot(windowing(a,function(x) var(x),50)-var[25:(length(var)-25)])
+
+m<-mean(a)
+
+
+
+plot(mapply(function(x,v)-log10(dnorm(a,mean(a),var(a))),var,a))
+
+mean(a)
+
+
+plot(windowing(floorFunction(function(...) getHeights(slowDist(...),c(-300,300)),"AGTANBA","AAHATN",Sequences,reg[,1]),function(x) -log10(dnorm(x[25],mean(x),var(x))),50 )[150:400],ylab="")
+
+plot(getHeights(slowDist("AGTANBA","AAHATN",Sequences,reg[,1])))
+
+
+#mots<-c(mots[1:(n-length(addmotifs))],addmotifs)
+mL<-unlist(lapply(m1,IUPACtoBase))
+cL<-unlist(lapply(lapply(m1,IUPACtoBase),compliment))
+locationsM<-lapply(mL,grep,Sequences)
+locationsC<-lapply(cL,grep,Sequences)
+
+tm<-IUPACtoBase(m2)
+loc<-which(reg[,1])
+sub<-intersect(loc,grep(tm,Sequences))
+a<-unlist(lapply(gregexpr(tm, Sequences[sub]),as.numeric))
+plot(getHeights(a))
+
+
+t0f<-loadFlatData("motifMatrix.txt")
+rownames<-rownames(t0f)
+colnames<-colnames(t0f)
+mots<-unique(unlist(lapply(rownames,function(x) strsplit(x,"-")[[1]][1])))
+
+
+
+
+
+m<-motifs2View("CANNTG","TGACCT",reg[,3],Sequences)
+
+m1<- "RGACAT"
+m2<- "AAHATN"
+c=1
+
+m1<- "NTNSGVSYNG"
+m2<- "GMTGG"
+c=1
+
+c=2
+m1<-"MAGDS"
+m2<-"KGVNNGNAA"
+
+m1<-"KNWVNAN"
+m2<-"HTYKNABNK"
+
+m1<-"TAATCC"
+m2<-"YACYWKGN"    
+c<-7
+
+m1<-"CANNTG"
+m2<-"MAGDS"
+c<-1
+unlist(Map(function(x) as.character(jasparVals[which(as.character(jasparVals[,1])==x),2]),c(m1,m2)))    
+    lables<-paste(m1,m2,c,sep="-")
+    y<-as.numeric(t0f[which(rownames==lables),])
+    x<-as.numeric(colnames)
+    v<-data.frame(x=x,y=y)
+v[rev(order(floorWidth(v$y,v$x,-nchar(m1),nchar(m2))))[1:10],]
+plot(v$x,floorWidth(v$y,v$x,-nchar(m1),nchar(m2)))
+
+m<-singleScore(m1,m2,5,function(x) -log10(binomTri(x)))
+plot(m)
+
+
+
+
+
+singleScore<-function(m1,m2,c,fun){
+    lables<-paste(m1,m2,c,sep="-")
+    y<-as.numeric(t0f[which(rownames==lables),])
+    x<-as.numeric(colnames)
+    v<-data.frame(x=x,y=y)
+    score<-do.call(fun,list(v))
+    score<-floorWidth(score,v$x,-nchar(m1),nchar(m2))
+    score
+    }
+
+
+#plot(x$x[x$x>-50 & x$x<50],x$y[x$x>-50 & x$x<50])
+
+############
+
+
+results<-testScore(y[lines>4,],lines[lines>4],windowNormalizedFoldChange)
+
+results<-testScore(y[1:100,],lines[1:100],function(x) -log10(binomTri(x)))
+
+cut<-3
+TP<-length(which(vals>cut & lines>1))
+FP<-length(which(vals>cut & lines<2))
+TN<-length(which(vals<cut & lines<2))
+FN<-length(which(vals<cut & lines>1))
+
+
+
+b<-do.call(plotPort,as.list(y[86,] ))
+
+
+# 117
+# 94
+# 97
+v<-do.call(quickSelect,as.list(y[97,]))
+
+
+r<-singleScore(y,lines,122,function(x) -log10(binomTri(x)))
+
+l<-c()
+n<-301
+m<-1000
+y<-t(combn((1:n),2))[sample(seq(dim(combn((1:n),2))[2]))[1:m],]
+#y<-cbind(runif(n,1,301),runif(n,1,301))
+for (i in seq(m)){
+    r<-singleScore(y,c(1),i,function(x) -log10(binomTri(x)))
+    #plot(do.call(quickSelect,as.list(y))$y)
+    l<-rbind(l,cbind(max(r),mean(r),sqrt(var(r))))}
+
+scores<-(l[,1]-l[,2])/l[,3]
+
+scores<-l[,1]
+rev(order(scores,na.last=FALSE))[1:5]
 
     
 

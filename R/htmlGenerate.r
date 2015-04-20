@@ -10,20 +10,6 @@
 #
 ######################################################################
 ######################################################################
-#
-# Usage:
-# 
-#sets<-c("normal_not_normal.pwm", "abnormal_not_abnormal.pwm")
-#shortNames<-c("n_not_a","a_not_n")
-#fileLocation<-"~/Dropbox/temp-data/"
-#pScoreFile<-"/home/agriffith/Dropbox/temp-data/p-score_table_1.tab"
-#imageDirectory="/home/agriffith/Dropbox/temp-data/"
-#printFasta(fileLocation,sets,shortNames,imageDirectory)
-#write(htmlGenerateMain(fileLocation,sets,shortNames,imageDirectory,n=2),
-#       "a-score_other.html")
-#
-######################################################################
-######################################################################
 
 #' @export
 getScore<-function(pScore,motif,name){
@@ -89,6 +75,18 @@ printFasta<-function(fileLocation,sets,shortNames,imageDirectory){
     }
 }
 
+#' html GenearateMain
+#' Generatates an html file to visualize motifs juxtaposed from one
+#' another
+#' @examples
+#' sets<-c("normal_not_normal.pwm", "abnormal_not_abnormal.pwm")
+#' shortNames<-c("n_not_a","a_not_n")
+#' fileLocation<-"~/Dropbox/temp-data/"
+#' pScoreFile<-"/home/agriffith/Dropbox/temp-data/p-score_table_1.tab"
+#' imageDirectory="/home/agriffith/Dropbox/temp-data/"
+#' printFasta(fileLocation,sets,shortNames,imageDirectory)
+#' write(htmlGenerateMain(fileLocation,sets,shortNames,imageDirectory,n=2),
+#'       "a-score_other.html")
 #' @export
 htmlGenerateMain<-function(fileLocation,sets,shortNames,imageDirectory,n=3,pScoreFile){
     I<-sequenceGen(fn=imageList,n=n,shortNames=shortNames,fileLocation,sets,imageDirectory)
@@ -97,18 +95,19 @@ htmlGenerateMain<-function(fileLocation,sets,shortNames,imageDirectory,n=3,pScor
     mat<-matrix(unlist(lapply(seq(n),function(x){lapply(list(I,IP,M),getFrameChar,x)})),ncol=3*n)
     htmlDoc(htmlTags("head",htmlTags("title", "Test Images")),htmlTags("body",c(htmlTable(mat))))}
 
-htmlGenerateHelp <- function(){
-    output<-c("Usage:\n\n",
-              "htmlGenerate.r \\\n",
-              "\t-f ~/Dropbox/temp-data/ \\\n",
-              "\t-i /home/agriffith/Dropbox/temp-data/ \\\n",
-              "\t-p /home/agriffith/Dropbox/temp-data/p-score_table_1.tab \\\n",
-              "\t-s normal_not_normal.pwm,abnormal_not_abnormal.pwm \\\n",
-              "\t-n n_not_n,a_not_a -o test.html\n\n",
-              "The location of the sets\t-f --filelocation \n",
-              "The location of the images\t-i --imageDirectory \n")
-    write(lcollapse(output),stdout())
-    quit()}
+## functions for comand line scripts
+#htmlGenerateHelp <- function(){
+#    output<-c("Usage:\n\n",
+#              "htmlGenerate.r \\\n",
+#              "\t-f ~/Dropbox/temp-data/ \\\n",
+#              "\t-i /home/agriffith/Dropbox/temp-data/ \\\n",
+#              "\t-p /home/agriffith/Dropbox/temp-data/p-score_table_1.tab \\\n",
+#              "\t-s normal_not_normal.pwm,abnormal_not_abnormal.pwm \\\n",
+#              "\t-n n_not_n,a_not_a -o test.html\n\n",
+#              "The location of the sets\t-f --filelocation \n",
+#              "The location of the images\t-i --imageDirectory \n")
+#    write(lcollapse(output),stdout())
+#    quit()}
 
 # main<-function(){
 #    spec = matrix(c(

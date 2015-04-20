@@ -7,19 +7,10 @@
 # Author :Alexander Griffith
 # Contact: griffitaj@gmail.com
 #
-#
-######################################################################
-######################################################################
-#
-# Usage:
-#
-# title<-htmlTags("title", "Test Page")
-# head<-htmlTags("head",title)
-# body<-htmlTags("body",htmlTags("p","This is the test page."))
-# htmlDoc(head,body)
 
-#source("aux.r")
 
+#' Build Anotations
+#' @export
 buildAnotations<-function(...){
     value<-c(...)
     l=length(value)
@@ -27,7 +18,9 @@ buildAnotations<-function(...){
     if(modulous(l,2)==0)
         collect(seq(from=1,to=l,by=2),function(x)
             {collapse(" ",value[x],'="',value[x+1],'"')})}
-        
+
+#' htmlTags
+#' @export
 htmlTags<-function(tag,value=FALSE,anotations=FALSE){
     closeT<-"/>"
     an<-""
@@ -39,10 +32,20 @@ htmlTags<-function(tag,value=FALSE,anotations=FALSE){
         closeT<-collapse(an,closeT)
     collapse("<",tag,closeT)}
 
+#' html Doc
+#' A minamilistic compelation of functions for the generation of html
+#' @examples
+#' title<-htmlTags("title", "Test Page")
+#' head<-htmlTags("head",title)
+#' body<-htmlTags("body",htmlTags("p","This is the test page."))
+#' htmlDoc(head,body)
+#' @export
 htmlDoc<-function(...,doctype="<!DOCTYPE html>",tag="html"){
     html<-htmlTags(tag,collapse(...))
     collapse(doctype,html)}
 
+#' html Table
+#' @export
 htmlTable<-function(x,...){
     br<-""
     shape<-dim(x)
@@ -55,5 +58,7 @@ htmlTable<-function(x,...){
          }   
     htmlTags("table",br,...)}
 
+#' html Image
+#' @export
 htmlImage<-function(location,...){
     htmlTags("img",anotations=c(buildAnotations("src",location,...)))}

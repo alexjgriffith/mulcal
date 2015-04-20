@@ -7,6 +7,19 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 
+
+#' member
+#' @export
+member<-function(posibList,mem,test="default"){
+    fun<-switch(test,default=function(x,y){all(y %in% x)})
+    sapply(posibList,fun,mem)}
+
+#' Member Wrapper
+#' Ment for bed data where the member is found in the fourth column
+#' @export
+memberWrapper<-function(bedData,lis ,n=4,sep="-"){
+    member(strsplit(as.character(bedData[,n]),sep),lis)}
+
 #' @export
 cdf<-function(m,range){
     x<-abs(m)    
@@ -22,6 +35,37 @@ pdf<-function(x){
  x[2:(l-0)]-x[1:(l-1)]
 }
 
+#' @export
+windowing.data.frame<-function(x,fun,window,sliding=FALSE) {
+        n<-dim(x)[1]
+        if(sliding)
+            unlist(lapply(seq(floor(n/window)),function(i) do.call(fun,list(x[((i-1)*window+1):(i*window),]))))
+        else
+            unlist(lapply(seq(n-window),function(i) do.call(fun,list(x[i:(i+window),])))) 
+}
+
+#' @export
+windowing.vector<-function(x,fun,window,sliding=FALSE){
+        n<-length(x)
+        if(sliding)
+            unlist(lapply(seq(floor(n/window)),function(i) do.call(fun,list(x[((i-1)*window+1):(i*window)]))))
+        else
+            unlist(lapply(seq(n-window),function(i) do.call(fun,list(x[i:(i+window)]))))       
+        }
+
+#' @export
+windowing<-function(x,...){
+    if(is.null(attr(x,"class"))){
+        args<-list(x,...)
+        if(is.numeric(x))
+            do.call(windowing.vector,args)
+        else if(is.matrix(x))
+            do.call(windowing.data.frame,args)
+        }
+    else UseMethod("windowing",x)
+}
+
+
 
 # aux.r -> utils.r
 #' @export
@@ -34,6 +78,21 @@ collect<-function(x,fn,...){lcollapse(sapply(x,fn,...))}
 modulous<-function(x,m)
     {t1<-floor(x/m)
      (x-t1*m)}
+
+#' @export
+is.even<-function(x){
+    modulous(x,2)==0
+}
+
+#' @export
+is.odd<-function(x){
+    modulous(x,2)!=0
+}
+
+#' @export
+is.prime<-function(x){
+    length(which( modulous(x,seq(1:ceiling(x/2)))==0))==1
+}
 
 
 

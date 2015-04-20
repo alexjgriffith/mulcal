@@ -7,8 +7,6 @@
 # Author : Alexander Griffith
 # Contact: griffitaj@gmail.com
 
-#library(parallel)
-
 #' loadBedFile
 #' 
 #' Calls file_length and read_bed from hg19Height.c and returns a 3 column bed file
@@ -71,6 +69,18 @@ getPileUp<-function(file,bed,chroms,peakLength){
 #' @param data A preloaded bed data.frame which includes slots $chro $start $end
 #' @param rawdata a list of raw data files
 #' @param n the number of nodes to use. If 0 then the parrallel package is not used
+#' @examples
+#'    cats<-read.table("/home/griffita/Dropbox/UTX-Alex/jan/catagories")
+#'    prefix<-"/mnt/brand01-00/mbrand_analysis/data_sets/"
+#'    suffix<-"_sorted.bed"
+#'    rawdata<-apply(cats,1,function(x){paste(prefix,x,"/",x,suffix,sep="")})
+#'    data<-hg19Sort(loadBedFile(file))
+#'    score<-pileUp(data,rawdata,n=22)
+#'    temp<-cor(score)
+#'    rownames(temp)<-t(cats)
+#'    colnames(temp)<-t(cats)
+#'    pdf("test.pdf")
+#'    plot(hclust(dist(temp)),hang=-1)
 pileUp<-function(data,rawdata,n=0){
     for(file in rawdata){
         if(!file.exists(file)){
@@ -100,7 +110,6 @@ hg19Sort<-function(data){
 #' getData
 #'
 #' loads data from file returns a sorted set with a height matrix
-#'
 #' @export
 #' @template authorTemplate
 #' @param file peak file
@@ -111,41 +120,3 @@ getData<-function(file,rawdata,n=0){
     score<-pileUp(data,rawdata,n=n)
     c(data=data,score=score)}
 
-#' mainProf
-#'
-#' A simple test function for speed
-#'
-#' @export
-#' @template authorTemplate
-mainProf<-function(file="/home/agriffith/Dropbox/UTX-Alex/jan/combined_sorted.bed",
-                   rawdata=rep(file,22),
-                   n=0){
-    Rprof("temp.prof")
-    data<-hg19Sort(loadBedFile(file))
-    score<-pileUp(data,rawdata,n=n)
-    print(str(score))
-    Rprof(NULL)
-    summaryRprof("temp.prof")}
-
-
-
-
-#' test
-#'
-#' @export
-testHeights<-function(){
-    file<-"/home/griffita/Dropbox/UTX-Alex/jan/combined_sorted.bed"
-
-    cats<-read.table("/home/griffita/Dropbox/UTX-Alex/jan/catagories")
-    prefix<-"/mnt/brand01-00/mbrand_analysis/data_sets/"
-    suffix<-"_sorted.bed"
-    rawdata<-apply(cats,1,function(x){paste(prefix,x,"/",x,suffix,sep="")})
-
-    data<-hg19Sort(loadBedFile(file))
-    score<-pileUp(data,rawdata,n=22)
-    temp<-cor(score)
-    rownames(temp)<-t(cats)
-    colnames(temp)<-t(cats)
-    pdf("test.pdf")
-    plot(hclust(dist(temp)),hang=-1)
-    dev.off()}

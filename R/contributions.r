@@ -23,11 +23,18 @@
 #' swCat<-c("Erythroid","K562","Jurkat","CEM","RPMI","Prima5(Brand)","Prima2","Prima5","Megakaryocite","ECFC","CD133","CD34")
 #' names(swCat)<-c("eryt","k562","jurk","cem","rpmi","tall_p1","tall_p2","tall_p3","meka","ecfc","cd133","cd34")
 #' tSwCat<-as.character(unlist(lapply(catagories,function(x) swCat[x])))
-#' stackedContrib(pcs[,1],catagories)
-#'
+#' stackedContrib(pcs[,1],catagories,tSwCat)
 #' @export
 #' @template authorTemplate
-stackedContrib<-function(data,catagories,swCat=catagories,steps=40,n=10,f=c(function(x){mean(x)+sqrt(var(x))*n},function(x){mean(x)-sqrt(var(x))*n}),sum=FALSE){
+stackedContrib<-function(data,
+                         tags,
+                         catagories,
+                         swCat=catagories,
+                         steps=40,
+                         n=10,
+                         f=c(function(x){mean(x)+sqrt(var(x))*n},
+                             function(x){mean(x)-sqrt(var(x))*n})
+                        ,sum=FALSE){
     boundLimit<-function(min,vector,width){
         f<-cbind(function(x){x>=min},
                  function(x){x<min+width})
@@ -59,46 +66,3 @@ stackedContrib<-function(data,catagories,swCat=catagories,steps=40,n=10,f=c(func
             scale_y_continuous(breaks=NULL)+
             scale_x_continuous(name="Principle Component Value") +
              scale_fill_discrete(name="Cell Conditions")}
-
-
-alternatPCAPLot<-function(){
-catagories<-t(read.table("~/Dropbox/UTX-Alex/jan/catagories"))
-
-
-swCat<-c("Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","Abnormal","ECFC","MEKA","Stem","Stem","Stem","Normal","Normal","Normal","Normal","Normal")
-names(swCat)<-catagories
-
-cats<-as.character(unlist(lapply(catagories,function(x) swCat[x])))
-
-values<-loadHeightFile("~/Dropbox/UTX-Alex/jan/combined_heights.bed")
-data<-values$data
-info<-values$info
-
-width<-dim(data)[2]
-#normData<-standPCAPrep(data)
-pcs<-as.matrix(mulcal::ascore(data,c(1,3)))
-#plotPCs(pcs,c(1,2),normData,catagories)
-
-pc1<-pcs[,1]
-pc2<-pcs[,2]
-
-x<-t(as.matrix(cbind(pc1,pc2))) %*% as.matrix(normData)
-dt<-data.frame(x=x[1,],y=x[2,],catagories=as.character(t(cats)),vals=as.character(t(catagories)))
-
-colour=factor(vals)
-
-
-vals<-c(Abnormal=21,Normal=22,MEKA=23,Stem=24,ECFC=25)
-shapelist<-unlist(lapply(cats[order(catagories)],function(x) vals[x]))
-
-ggplot(dt,aes(x,y))+
-    geom_point(aes(shape=catagories,colour=vals,fill=vals),size=2)+
-    geom_dl(aes(label=catagories),method=list(smart.grid))+
-    scale_shape_manual(values=c(Abnormal=21,Normal=22,MEKA=23,Stem=24,ECFC=25),guide="none")+
-     theme(panel.background=element_blank(),panel.grid.major=element_blank(),panel.grid.minor=element_blank(),panel.border=element_rect(fill=NA))+
-guides(shape=FALSE,colour=guide_legend(override.aes=list(shape=shapelist,size=6)))
-
-ggsave("test.pdf",width=1024,height=780)
-
-}
-
