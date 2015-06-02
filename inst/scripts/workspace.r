@@ -5,6 +5,130 @@ library(ggplot2)
 library(data.table)
 
 
+######################
+date<-"May 12 2014"
+author<-"Alexander Griffith"
+
+plus<-function(...){paste(...,collapse = "",sep="")}
+
+FastaFile<-"~/Dropbox/UTX-Alex/jan/combined.fasta"
+v<-loadHeightFile("~/Dropbox/UTX-Alex/jan/combined_heights.bed")
+data<-v$data
+stats<-v$stats
+formatOut<-apply(sub("   ","",stats[,1:3]), 1,paste,collapse="\t")
+
+reg<-mapply(function(pc,loc)buildRegions(data,pc,loc)[,1],
+            list(1,1,3,c(3,5),c(3,7),c(3,7),7),
+            list("top","bottom","top",c("top","top"),c("top","bottom"),c("top","bottom"),"top"))
+
+
+Sequences <- readDNAStringSet(FastaFile, "fasta")
+
+folder="~/Dropbox/UTX-Alex/analysis/workspace/"
+motifFile<-sapply(c("tall_union_hspc_vs_not_tall_union_hspc.pwm",
+             "tall_inter_hspc_vs_not_tall_union_hspc.pwm",
+             "tall_vs_not_tall_union_hspc.pwm",
+             "hspc_vs_not_tall_union_hspc.pwm"), function(x) paste(folder,x ,sep=""))
+
+
+regJ<-cbind((reg[,2] | reg[,5]),reg[,2] & reg[,5] , reg[,2],reg[,5])
+#regN<-apply(regJ, 1 ,"!")
+regN<-(! regJ[,1])
+
+for (i in seq(4))
+    motifs<-homerWrapper(Sequences,regJ[,i],regN,"~/Masters/mulcal/inst/lib/homer-4.7/cpp/homer2",motifFile[i],opts=" -S 25 -len 6")
+
+# 1+   Eryt/K562  1-
+# 1-   T-All      1+
+# 3+   ECFC       3-
+# 3+5+ Other      3-5-, 3+5- , 3-5+
+# 3+7- HSPC       3-7-, 3+,7+, 3-,7+
+# 3+7+ MEKA       3-,7-, 3-,7+ 3+,7-
+# 7+   Eryt/Meka  7-
+
+#a<-motifs2View("AGNCAGAC","CANNTG",reg[,2],Sequences,nearHeights=TRUE)
+quickplot(a)
+length(a)
+#b<-motifs2View("AGNCAGAC","CANNTG",reg[,2],Sequences,nearHeights=FALSE)
+quickplot(b)
+length(b)
+#560
+#1301
+
+#e<-motifs2View("AGNCAGAC","CANNTG",reg[,5],Sequences,nearHeights=TRUE)
+quickplot(e)
+length(e)
+#f<-motifs2View("AGNCAGAC","CANNTG",reg[,5],Sequences,nearHeights=FALSE)
+quickplot(f)
+length(f)
+# 163
+# 305
+# -6 AGNCAGAC-CANNTG AGNCAGACANNTG
+#c<-motifs2View("AGNCAGAC","CANNTG",reg[,1],Sequences,nearHeights=TRUE)
+quickplot(c)
+length(c)
+
+#d<-motifs2View("AGNCAGAC","CANNTG",reg[,1],Sequences,nearHeights=FALSE)
+quickplot(d)
+length(d)
+# 748
+# 612
+
+
+runA<-motifs2View("ACCACA","CANNTG",reg[,2],Sequences,nearHeights=FALSE)
+quickplot(runA)
+length(runA)
+
+runB<-motifs2View("ACCACA","CANNTG",reg[,2],Sequences,nearHeights=TRUE)
+quickplot(runB)
+length(runB)
+
+
+maxLoc<-function(x) {which.max(getHeights(x))+min(x)}
+quickplot<-function(a,...){plot(do.call(seq,as.list(range(a)+1)),getHeights(a),...); maxLoc(a)}
+
+
+m12<-c("ACCACA", "CANNTG","AGNCAGAC")
+mList<-unlist(lapply(m12,IUPACtoBase))
+cList<-lapply(unlist(lapply(m12,IUPACtoBase)),compliment)
+locationsM<-lapply(mList,grep,Sequences)
+locationsC<-lapply(cList,grep,Sequences)
+
+states<-function(reg,...){
+    do.call(rbind,
+            lapply(reg,
+                   function(x,y)
+                       {do.call(rbind,lapply(y, append,x))}
+                  ,list(...))
+            )
+}
+
+st<-states(c(1,2),c(1,2),c(3,2))
+
+h<-apply(st,1,function(x)motifHist(Sequences,mList,cList,locationsM,locationsC,x[1],x[2],reg[,x[3]]))
+
+#histVisualize(h[[2]],m12[1],m12[2])
+
+histVisualize(h,m1,m2)
+    h<-unlist(h)
+    
+    else{
+        h<-nearSummit(Sequences,mList,cList,locationsM,locationsC,1,reg)}
+ 
+h
+######################
+
+
+
+smad<-rep(FALSE,length(Sequences))
+smad[grep(IUPACtoBase("AGNCAGAC"),Sequences)]=TRUE
+smad[compliment(grep(IUPACtoBase("AGNCAGAC"))),Sequences)]=TRUE
+
+write.table(formatOut[smad&reg[,2]],"tall-smad_peaks.bed",quote=FALSE,row.names=FALSE,col.names=FALSE)
+
+
+######################
+
 findLocations<-function(ml,Sequences,subset=seq(length(Sequences))){    
         subset[grep(ml,Sequences[subset])]
 }
@@ -587,6 +711,8 @@ motifGetScore<-function(h,m,mots,addmotifs,upt=TRUE){
                            ma})
     scores
 }
+
+
 
 
 

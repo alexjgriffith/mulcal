@@ -58,7 +58,7 @@ rankChroms<-function(lis){
 #' @param chroms a list of chromosomes whos string values have been repalced with ranks
 #' @param peakLength The length of the bed data provided
 getPileUp<-function(file,bed,chroms,peakLength){
-    results<-.C("pileup",file,chroms,bed$start,bed$end,as.integer(peakLength),score=integer(peakLength))
+    results<-.C("pileup",file,chroms,as.integer(as.character(bed$start)),as.integer(as.character(bed$end)),as.integer(peakLength),score=integer(peakLength))
     results$score}
 
 #' PileUp

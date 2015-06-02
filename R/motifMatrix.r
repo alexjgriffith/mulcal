@@ -145,7 +145,7 @@ loadData<-function(filename){
 }
 
 #' @export
-buildRegions<-function(data,pc,location,directory="~/Masters/mulcal/inst/data/",title=paste(directory,paste(apply(cbind(pc,location),1,function(x) paste(x,collapse="_") ),collapse="_"),sep="")){
+buildRegions<-function(data,pc,location,ns=1,directory="~/Masters/mulcal/inst/data/",title=paste(directory,paste(apply(cbind(pc,location),1,function(x) paste(x,collapse="_") ),collapse="_"),sep="")){
     testCombs<-function(x,data){
         data<-as.matrix(data)
         m<-do.call(ascore,append(list(data),lapply(x[2:4],unlist)))
@@ -173,7 +173,7 @@ buildRegions<-function(data,pc,location,directory="~/Masters/mulcal/inst/data/",
     temp<-do.call(rbind,combinations(lapply(1:length(pc),function(x) list((x-1)*2+1,(x-1)*2+2) )))
     loc<-apply( temp,1,function(x) all(x==fg ))
     bg<-matrix(temp[! loc],ncol=length(pc))
-    l<-list(title,unlist(lapply(pc,function(x)rep(x,2))),rep(c("top","bottom"),length(pc)), rep(1,length(pc)*2),rbind(fg,bg))
+    l<-list(title,unlist(lapply(pc,function(x)rep(x,2))),rep(c("top","bottom"),length(pc)), rep(ns,length(pc)*2),rbind(fg,bg))
     reg<-do.call(testCombs,list(l,list(data)))
     reg
 }

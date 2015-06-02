@@ -7,7 +7,7 @@
 \url{https://github.com/alexjgriffith/mulcal}
 }
 \usage{
-tags(fileList, cats, overlapWidth, outputWidth)
+tags(fileList, cats, overlapWidth, outputWidth, macsCutoff = 0)
 }
 \arguments{
 \item{cats}{c(cat1,cat2,cat3) ; each cat relates to a single file in order}

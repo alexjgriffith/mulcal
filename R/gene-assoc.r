@@ -89,6 +89,7 @@ genomicRegions<-function(chrom,tss,proxUp,proxDown,distal,n=length(chrom)){
 #' for (i in seq(7)){
 #'    genes<-peakGeneRegions(bedData[reg[,i],],a,geneList)
 #'    write.table(genes,filenames[[i]],quote=FALSE,col.names=FALSE,row.names=FALSE)}
+#' @export
 peakGeneRegions<-function(bedData,genes,geneList){
     aChr<-as.character(lapply(genes,"[[",1))
     aStart<-as.numeric(lapply(genes,"[[",2))
@@ -109,7 +110,7 @@ peakGeneRegions<-function(bedData,genes,geneList){
         gene<-which(peaks[i]>cStart &peaks[i]<cEnd)
         locs<-c(locs,gene)
     }
-    geneList$name2[
+    geneList[
                    as.numeric(unique(unlist(lapply(genes[unique(locs)],function(x) {x[4:length(x)]}))))
     ]
 }

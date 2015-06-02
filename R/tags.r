@@ -15,6 +15,7 @@
 #' @param width integer or double
 #' @return a range value+width value-width where value-width >0
 #' @template authorTemplate
+#' @export
 testZero<-function(value,width){
     shift<-value-width
     if(shift>=0)
@@ -30,7 +31,7 @@ testZero<-function(value,width){
 #' @param chrdata Sorted input bed files all as elements as character
 #' @param width The width which will be outputed
 #' @template authorTemplate
-outputFile<-function(peaks,chrdata,width=150){
+outputFile<-function(peaks,chrdata,chrcats,fileOrder,width=150,scores=FALSE){
     output<-mapply(function(i1,i2,width=300){
         summit<-as.character(testZero(floor(mean(as.double(chrdata[i1:i2,5]))),width) )
         filevalues<-lapply(chrdata[i1:i2,10],function(x){chrcats[which(sub("_[[:digit:]]*$","",x,perl=TRUE)==fileOrder)]})
@@ -38,7 +39,11 @@ outputFile<-function(peaks,chrdata,width=150){
         chro<-chrdata[i1,1]
         c(chro,summit,files)
     },peaks[1,],peaks[2,],MoreArgs=list(width=width))
-    data.frame(t(output))}
+    data<-data.frame(t(output))    
+    colnames(data)<-c("chro","start","end","tags")
+    data
+    #apply(data,1,function(x) gregexpr(x[4],)
+    }
 
 #' tags
 #'
@@ -50,21 +55,24 @@ outputFile<-function(peaks,chrdata,width=150){
 #' @param outputWidth +/- value from the estimated peak summit (twice that of \code{\link{overlapWidth}})
 #' @export
 #' @template authorTemplate
-tags<-function(fileList,cats,overlapWidth,outputWidth){
+tags<-function(fileList,cats,overlapWidth,outputWidth,macsCutoff=0){
     chrcats<-as.character(unlist(cats))
     temp<-as.character(do.call(rbind,lapply(fileList,read.table,header=TRUE,nrow=1))$name)
     fileOrder<-unlist(lapply(temp ,function(x){substr(x,1,nchar(x)-2)}))
     rm(temp)
     dataset<-do.call(rbind,lapply(fileList,read.table,header=TRUE))
     dataset<-dataset[with(dataset,order(chr,abs_summit)),]
+    idex<-(as.numeric(as.character(dataset$X.log10.pvalue.)) >macsCutoff)
+    dataset<-dataset[idex,]
     chrdata<-as.matrix(dataset)
     l<-nrow(dataset)
     t1<-dataset[1:l-1,]
     t2<-dataset[2:l,]
-    b<-mapply(all,chr=t1$chr==t2$chr , summit=abs(t1$abs_summit-t2$abs_summit)<overlapWidth)
+    #b<-mapply(all,chr=t1$chr==t2$chr , summit=abs(t1$abs_summit-t2$abs_summit)<overlapWidth)
+    b<-(t1$chr==t2$chr & abs(t1$abs_summit-t2$abs_summit)<overlapWidth)
     prePeaks<-unlist(lapply(which(b==FALSE),function(x){c(x,x+1)}))
-    peaks<-matrix(c(1,prePeaks[1:length(prePeaks)-1]),nrow=2)
-    outputFile(peaks,chrdata,outputWidth)}
+    peaks<-matrix(c(1,prePeaks[1:length(prePeaks)-1]),nrow=2)    
+    outputFile(peaks,chrdata,chrcats,fileOrder,outputWidth)}
 
 #' testTags
 #'

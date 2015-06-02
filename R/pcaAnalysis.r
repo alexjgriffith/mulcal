@@ -235,18 +235,47 @@ pcaAnalysisTest<- function(pc1=1, pc2=3)
 #'
 #' @export
 hcTest<-function(){
+
+    cats2<-data.frame(tall_p1="Prima5",
+                      tall_p2_1="Prima2",
+                      tall_p2_2="Prima2",
+                      tall_p3_1="Prima5",
+                      tall_p3_2="Prima5",
+                      jurk_sandar_1="Jurkat",
+                      jurk_sandar="Jurkat",
+                      jurk="Jurakt",
+                      rpmi_1="RPMI",
+                      rpmi_2="RPMI",
+                      cem_1="CEM",
+                      cem_2="CEM",
+                      "ecfc-tsa"="ECFC",
+                      meka="Meka",
+                      cd133="HSC",
+                      cd34="HSC",
+                      cd34_new="HSC",
+                      eryt="Erythroid",
+                      eryt_f="Erythroid",
+                      eryt_a="Erythroid",
+                      k562_1="K562",
+                      k562_2="K562")
+    
     root_file<-"~/Dropbox/UTX-Alex/jan/"
-    mock<-cbind("combined")
+    mock<-cbind("single")
     i=1
     values<-loadHeightFile( paste(root_file,mock[i],"_heights.bed",sep="" ))
     cats<-t(read.table(paste(root_file,"catagories",sep="" )))
+    cats3<-unlist(lapply(cats,function(x){as.character(cats2[[gsub("-",".",x)]])}))
     data<-values$data
     temp<-cor(data)
-    rownames(temp)<-cats
-    colnames(temp)<-cats
+    rownames(temp)<-cats3
+    colnames(temp)<-cats3
     #png("~/Dropbox/dend_corr_average_combiend.png")
     dend=hclust(dist(temp),method="average")
     plot(dend,hang=-1,main="Combinded Mock Dendogram",xlab="Cell Type")
+    require(dendextend)
+    d1<-as.dendrogram(hclust(dist(1-temp),method="single"))
+    c1<-color_branches(d1,k=4,col=c("green","red","blue","orange"))
+    plot(c1)
     #dev.off()
     #png("~/Dropbox/heatmap.png")
     heatmap(1-log(cor(values$data)) ,hclustfun=function(x)hclust(x,method="complete") ,distfun=function(x)as.dist(x),scale="column")

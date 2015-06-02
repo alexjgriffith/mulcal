@@ -1,18 +1,35 @@
+library(mulcal)
+library(Biostrings)
+
 heightFile<-"~/Dropbox/UTX-Alex/jan/combined_heights.bed"
+fileLocation<-"~/Dropbox/UTX-Alex/jan/"
 geneList<-read.delim(paste(fileLocation,"hg19.RefSeqGenes.csv",sep=""))
+bedData<-read.delim(paste(fileLocation,"combined_sorted.bed",sep=""),header=0)
 data<-loadHeightFile(heightFile)$data
-reg<-mapply(function(pc,loc)buildRegions(data,pc,loc)[,1],
-            list(1,1,3,c(3,5),c(3,7),c(3,7),7),
-            list("top","bottom","top",c("top","top"),c("top","bottom"),c("top","bottom"),"top"))
-filenames<-lapply(cbind("erythroid","t-all","ecfc","other","hspc","meka","diff"),paste, "-genes.txt",sep="")
+
+
 
 ## Generate a gene list using Stanford great
 chrom<-as.character(geneList$chrom)
 tss<-as.numeric(geneList$txStart)
-a<-genomicRegions(chrom,tss,5000,1000,50000)
+a<-genomicRegions(chrom,tss,5000,1000,50000) # takes about 3 min
+
+
+inlist<-paste( as.character(geneList$name),
+      as.character(geneList$name2), sep="\t")
+
+
+for(n in c(1,3,6))
+{
+reg<-mapply(function(pc,loc)buildRegions(data,pc,loc,ns=n)[,1],
+            list(1,1,3,c(3,5),c(3,7),c(3,7),7),
+            list("top","bottom","top",c("top","top"),c("top","bottom"),c("top","bottom"),"top"))
+filenames<-lapply(cbind("erythroid","t-all","ecfc","other","hspc","meka","diff"),paste, "-refseq-", n, "-genes.txt",sep="")
+print(filenames)
 for (i in seq(7)){
-   genes<-peakGeneRegions(bedData[reg[,i],],a,geneList)
+   genes<-peakGeneRegions(bedData[reg[,i],],a,inlist)
    write.table(genes,filenames[[i]],quote=FALSE,col.names=FALSE,row.names=FALSE)}
+}
 
 ## Generate a gene list based on proximity
 ## this method is gene centric and usefull for finding

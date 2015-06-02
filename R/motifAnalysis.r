@@ -260,7 +260,12 @@ motifTest<-function(fastaFile="~/Dropbox/UTX-Alex/jan/combined.fasta",
         bM<-lapply(c(mList[n1],mList[n2]),function(x) lapply(gregexpr(x, data[lM]),as.numeric))
     if(length(lC)>0)        
         bC<-lapply(c(cList[n1],cList[n2]),function(x) lapply(gregexpr(x, data[lC]),as.numeric))
-    h<-c(getDistance(bM[[1]],bM[[2]]),-getDistance(bC[[1]],bC[[2]]))
+    #h<-c(getDistance(bM[[1]],bM[[2]]),-getDistance(bC[[1]],bC[[2]]))
+    #print(c(mList[n1],consensusIUPAC(mList[n2]))
+    #print(nchar(mList[n1])-nchar(mList[n2]))
+    print(nchar(consenusIUPAC(mList[n1]))-nchar(consenusIUPAC(mList[n2])))
+    h<-c(getDistance(bM[[1]],bM[[2]]),-(nchar(consenusIUPAC(mList[n1]))-nchar(consenusIUPAC(mList[n2]))+getDistance(bC[[1]],bC[[2]])))
+    #h<-getDistance(bM[[1]],bM[[2]])#getDistance(bM[[1]],bM[[2]])#,-getDistance(bC[[1]],bC[[2]]))
     #if(length(h)>0)
        # hist(h,breaks=1000,xlim=width,xlab=paste(mList[n1],mList[n2],sep=" - "))
     h}
@@ -275,24 +280,25 @@ nearSummit<-function(data,mList,cList,locationsM,locationsC,n1,reg,width=150)
     bC<-c()
     if(length(lM)>0){
         bM<-lapply(gregexpr(mList[n1], data[lM]),as.numeric)
-        print(mList[n1])
+        #print(mList[n1])
     }
     if(length(lC)>0)        {
         bC<-lapply(gregexpr(cList[n1], data[lC]),as.numeric)
-        print("b")
+        #print("b")
     }
     h<-c(getDistance(unlist(bM),width),getDistance(unlist(bC),width))
     h}
 
 #' @export
-getDistance<-function(x,y){
+getDistance<-function(x,y,one=FALSE){
     as.numeric(
-        mapply(function(x,y){
+        unlist(mapply(function(x,y){
         temp<-outer(x, y,"-")
         temp<-temp[upper.tri(x=temp,diag=TRUE)]
-        temp[which.min(abs(temp))]
-        #temp
-    },x,y))}
+        #print(str(temp))
+        if(one ){temp[which.max(abs(temp))]}
+        else  {temp}
+    },x,y)))}
 
 #' Homer Wrapper
 #'
@@ -471,12 +477,12 @@ loadPWM<-function(fileLocation,version="homer")
                         if (! n==0){out<-append(out,list(matrix(box,4)))}
                         box<-c()
                         name<-c(name,d[1])
-                        info<-c(name,d[1:l])
+                        info<-c(info,d[2:l])
                         n<-n+1}
                 else{
                     box<-c(box,splitfun(d,l))
                 }}
-            cbind(name=name,data=append(out,list(matrix(box,4))) )}}    
+            cbind(name=name,info=info,data=append(out,list(matrix(box,4))) )}}    
     loadFunctions<-list(
         homer=c(
             skip=0,
