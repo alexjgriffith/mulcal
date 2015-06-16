@@ -12,21 +12,28 @@
 #'
 #' Implements the Stanford GREAT genomic region generation
 #' @export
-genomicRegions<-function(chrom,tss,proxUp,proxDown,distal,n=length(chrom)){
+genomeDomains<-function(chrom,tss,strand,proxUp,proxDown,distal,n=length(chrom)){
     extendsMax<-function(n,chrom,basalDomains,tss,distal){
         withinChrom<-(chrom[n]==chrom)
         a<-basalDomains[withinChrom,1]-tss[n]
-        ap<-a[a>0 & a> basalDomains[n,2]-tss[n] & a<distal]
-        if(length(ap>0))
+        ap<-a[a> basalDomains[n,2]-tss[n] & a<distal]
+        ab<-a[a>0 & a< basalDomains[n,2]-tss[n]]
+        
+        if(length(ab))
+            lm<-basalDomains[n,2]
+        else if(length(ap))
             lm<-tss[n]+min(ap)
         else
-            lm<-basalDomains[n,2]
+            lm<-tss[n]+distal            
         b<-tss[n]-basalDomains[withinChrom,2]
-        bp<-b[b>0 & b> tss[n]-basalDomains[n,1] &b<distal]
-        if(length(bp>0))
+        bp<-b[ b> tss[n]-basalDomains[n,1] & b<distal]
+        bb<-b[b>0 & b< tss[n]-basalDomains[n,1]]
+        if(length(bb))
+            um<-basalDomains[n,1]
+        else if(length(bp>0))
             um<-tss[n]-min(bp)
         else
-            um<-basalDomains[n,1]           
+            um<-tss[n]-distal
         geneDomain<-c(um,lm)
         geneDomain
     }
@@ -37,34 +44,42 @@ genomicRegions<-function(chrom,tss,proxUp,proxDown,distal,n=length(chrom)){
             psl<-csl[which(csl != as.character(gene))]}
         psl
     }
-    basalDomains<-do.call(rbind,lapply(tss,function(x) cbind(x-proxUp,x+proxDown)))
+    basalDomains<-t(apply(cbind(tss-strand*proxUp,tss+strand*proxDown),1,sort))
     genomeDomains<-do.call(rbind,lapply(seq(n),extendsMax,chrom,basalDomains,tss,distal))
-    a<-do.call(rbind,lapply(
-        lapply(
-            apply(cbind(genomeDomains,seq(dim(genomeDomains)[1])),1,function(x) list(x)) ,"[[",1)
-       ,function(x)rbind(cbind(x[1],x[3],"+"),cbind(x[2],x[3],"-"))))
-    domainsToAnalyze<-data.frame(chrom[1:n],a)
-    colnames(domainsToAnalyze)<-c("chrom","loc","gene","fun")
-    domainsToAnalyze
-    genomicRegionsList<-list()
-    for (j in unique(chrom[1:n])){
-         x<-domainsToAnalyze[domainsToAnalyze$chrom==j,]
-         y<-x[order(as.numeric(as.character(x$loc))),]
-         for (i in seq(length(y$loc))){
-             if(i==1){
-                 start<-as.numeric(as.character(y$loc[i]))
-                 psl<-as.character(y$gene[1])
-             }
-             else{
-                 s2<-as.numeric(as.character(y$loc[i]))
-                 if(length(psl)>0)
-                     genomicRegionsList<-append(genomicRegionsList,list(c(j,start,s2,psl)))
-                 start<-s2
-                 psl<-determ(psl,y$gene[i],y$fun[i])
-                 }
-         }
-     }
-    genomicRegionsList
+    return(genomeDomains)
+}
+
+
+#' Genomic Regions
+#' @export
+genomicRegions<-function(
+    a,chrom,
+    chroms=unique(chrom)){
+beg<-list()
+n=0
+b<-cbind(c(as.numeric(a[,1]),as.numeric(a[,2])),seq(length(a[,1])),unlist(lapply(c(0,1),function(x)rep(x,length(a[,1])))))
+
+for(cro in chroms){    
+    region=(chrom==cro)
+    k<-b[region,]
+    c<-k[order(k[,1]),]
+    buffer<-c(c[1,2])
+    reg<-list()
+    start<-c[1,1]
+    for(i in seq(2,length(which(region))*2)){
+        reg<-append(reg,list(c(cro,start,c[i,1],buffer)))
+        if(c[i,3]==0){
+            buffer<-c(buffer,c[i,2])
+        }else{
+            buffer<-buffer[c[i,2]!=buffer]}        
+        start<-c[i,1]
+    } 
+    n<-n+1
+    beg<-append(beg,reg[unlist(lapply(reg,function(x) length(x)>3))])
+    #beg<-append(beg,reg)
+    
+}
+return(beg)
 }
 
 #' Peak Gene Regions
@@ -103,16 +118,17 @@ peakGeneRegions<-function(bedData,genes,geneList){
     for (i in seq(length(bedData[,1]))){
         if(pc!=as.character(bedData[i,1])){
             pc<-as.character(bedData[i,1])
-            chroms<-(aChr==pc)
+            chroms<-which((aChr==pc))
             cStart<-aStart[chroms]
             cEnd<-aEnd[chroms]
         }
-        gene<-which(peaks[i]>cStart &peaks[i]<cEnd)
+        gene<-chroms[which(peaks[i]>cStart &peaks[i]<cEnd)]
         locs<-c(locs,gene)
     }
     geneList[
                    as.numeric(unique(unlist(lapply(genes[unique(locs)],function(x) {x[4:length(x)]}))))
     ]
+    #locs
 }
 
 #' Nearest Gene

@@ -4,9 +4,66 @@ library(Biostrings)
 library(ggplot2)
 library(data.table)
 
+########################
+date<-"June 3 2015"
+author<-"Alexander Griffith"
 
+a<-genomicRegions(chrom,tss,strand,5000,1000,5000) # takes about 3 min
+
+
+apply(reg, 2, function(x) length(which(x)))
+apply(reg, 2, function(x) length(intersection(which(x), which(smad))))
+length(which(smad))
+
+length(intersect(union(which(reg[,5]), which(reg[,2])),which(smad) ))
+
+       -210-length(which(reg[,5]))
+
+
+dataTypes<-c("eryt","tall","ecfc","other","meka","hspc","diff")
+
+heightFile<-"~/Dropbox/UTX-Alex/jan/combined_heights.bed"
+data<-loadHeightFile(heightFile)$data
+
+for(n in c(1,3,6)){
+reg<-mapply(function(pc,loc)buildRegions(data,pc,loc,n)[,1],
+            list(1,1,3,c(3,5),c(3,7),c(3,7),7),
+            list("top","bottom","top",c("top","top"),c("top","top"),c("top","bottom"),"top"))
+
+filenames<-paste("~/Dropbox/UTX-Alex/analysis/principle/",dataTypes,"/peaks/sd",n,"/single_peaks.bed",sep="")
+for(i in seq(7))
+    write.table(formatOut[reg[,i]],filenames[i],quote=FALSE,row.names=FALSE,col.names=FALSE)}
+
+
+dataLocs<-list(list("eryt", 1, "top"),
+               list("tall", 1,"bottom"),
+               list("ecfc",3,"top"),
+               list("other",c(3,5),c("top","top")),
+               list("meka",c(3,7),c("top","top")),
+               list("hspc",c(3,7),c("top","bottom")),
+               list("diff", 7, "top"))
+
+
+FastaFile<-"~/Dropbox/UTX-Alex/jan/combined.fasta"
+data<-loadHeightFile("~/Dropbox/UTX-Alex/jan/combined_heights.bed")$data
+Sequences <- readDNAStringSet(FastaFile, "fasta")
+filenames<-paste("~/Dropbox/UTX-Alex/analysis/principle/",dataTypes,"/motifs/basic/combined_motifs_1sd_9.pwm",sep="")
+for(i in seq(7)){
+    regs<-buildRegions(data,dataLocs[[i]][2],dataLocs[[i]][3])
+    motifFile<-filenames[i]
+    motifs<-homerWrapper(Sequences,regs[,1],regs[,2],"~/Masters/mulcal/inst/lib/homer-4.7/cpp/homer2",motifFile,opts="-S 25 -len 9")
+}
+
+
+filenames<-paste("~/Dropbox/UTX-Alex/analysis/principle/",dataTypes,"/genes/code/ucsc-code.txt",sep="")
+for(i in seq(7)){
+    genes<-peakGeneRegions(bedData[reg[,i],],b,inlist)
+    write.table(genes,filenames[i],quote=FALSE,row.names=FALSE,col.names=FALSE)}
+
+
+ 
 ######################
-date<-"May 12 2014"
+date<-"May 12 2015"
 author<-"Alexander Griffith"
 
 plus<-function(...){paste(...,collapse = "",sep="")}
@@ -17,9 +74,11 @@ data<-v$data
 stats<-v$stats
 formatOut<-apply(sub("   ","",stats[,1:3]), 1,paste,collapse="\t")
 
+
+### fix everywhere
 reg<-mapply(function(pc,loc)buildRegions(data,pc,loc)[,1],
             list(1,1,3,c(3,5),c(3,7),c(3,7),7),
-            list("top","bottom","top",c("top","top"),c("top","bottom"),c("top","bottom"),"top"))
+            list("top","bottom","top",c("top","top"),c("top","top"),c("top","bottom"),"top"))
 
 
 Sequences <- readDNAStringSet(FastaFile, "fasta")

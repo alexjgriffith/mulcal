@@ -305,16 +305,17 @@ getDistance<-function(x,y,one=FALSE){
 #' This is only a wrapper for the DENOVO functionality of homer2, homer must be installed on the system before this can be used.
 #' 
 #' @export
-homerWrapper<-function(sequences,foreground,background,homerLocation,motifsFile=FALSE,opts="-S 5 -len 6"){
-    treatmentFile<-tempfile()
-    controlFile<-tempfile()
+homerWrapper<-function(sequences,foreground,background,homerLocation,motifsFile=FALSE,opts="-S 25 -len 6"){
     if (!is.character(motifsFile))
         motifsFile<-tempfile()
+    treatmentFile<-tempfile()
+    controlFile<-tempfile()    
     writeXStringSet(sequences[foreground],treatmentFile)
     writeXStringSet(sequences[background],controlFile)
     cmd<-paste(homerLocation, "denovo -i ",treatmentFile," -b ",controlFile,opts," > ",motifsFile,sep=" ")
     system(cmd)
-    loadPWM(motifsFile,"homer")}
+    loadPWM(motifsFile,"homer")
+}
 
 #' PWM to Consensus Motif
 #'

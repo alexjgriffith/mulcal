@@ -4,9 +4,9 @@
 \alias{genomicRegions}
 \title{Genomic Regions}
 \usage{
-genomicRegions(chrom, tss, proxUp, proxDown, distal, n = length(chrom))
+genomicRegions(a, chrom, chroms = unique(chrom))
 }
 \description{
-Implements the Stanford GREAT genomic region generation
+Genomic Regions
 }
 
