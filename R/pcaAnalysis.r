@@ -9,8 +9,8 @@
 #
 
 #' @export
-loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed",n=3,norm=TRUE){  
-  cdata<-read.table(file)
+loadHeightFile<-function(file="~/masters/normal-abnormal/single_heights.bed",n=3,norm=TRUE,header=FALSE){  
+  cdata<-read.table(file,header=header)
   stats<-cdata[seq(n)]
   l=length(cdata)
   if(norm==TRUE)
