@@ -42,6 +42,7 @@ typedef struct chromosomes {
   char value[10];
   char shortValue[2];} chromosomes;
 
+//The chromosome order output of bwa is unusual
 static const chromosomes hg19Chrom[] = {
 {0,"chr1","1"},
 {1,"chr2","2"},
@@ -50,7 +51,7 @@ static const chromosomes hg19Chrom[] = {
 {4,"chr5","5"},
 {5,"chr6","6"},
 {6,"chr7","7"},
-{7,"chrY","Y"},
+{7,"chrX","X"},
 {8,"chr8","8"},
 {9,"chr9","9"},
 {10,"chr10","10"},
@@ -62,11 +63,11 @@ static const chromosomes hg19Chrom[] = {
 {16,"chr16","16"},
 {17,"chr17","17"},
 {18,"chr18","18"},
-{19,"chr19","19"},
 {20,"chr20","20"},
-{21,"chrX","X"},
-{22,"chr21","21"},
+{21,"chrY","Y"},
+{19,"chr19","19"},
 {23,"chr22","22"},
+{22,"chr21","21"},
 {24,"chrM","M"},
 {25,"chr",""}};
 

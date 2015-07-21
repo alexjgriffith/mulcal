@@ -81,6 +81,13 @@ getPileUp<-function(file,bed,chroms,peakLength){
 #'    colnames(temp)<-t(cats)
 #'    pdf("test.pdf")
 #'    plot(hclust(dist(temp)),hang=-1)
+#'
+#'    binSize=10000
+#'    regions<-do.call(rbind, apply(read.table("/data/binaries/BEDTools/genomes/human.hg19.genome")[1:24,],1, function(x,step) {y<-seq(1,as.numeric(x[2]),step); cbind(as.character(x[1]),as.character(y),as.character(y+step))} ,binSize))
+#'   data<-hg19Sort(data.frame(chro=regions[,1],start=as.integer(regions[,2]), end=as.integer(regions[,3])))
+#'   score<-pileUp(data,rawdata,n=22)
+#'     
+#' 
 pileUp<-function(data,rawdata,n=0){
     for(file in rawdata){
         if(!file.exists(file)){
@@ -102,7 +109,8 @@ pileUp<-function(data,rawdata,n=0){
 #' @template authorTemplate
 #' @export
 hg19Sort<-function(data){
-    neworder<-levels(data$chro)[c(1,12,16,17,18,19,20,24,21,22,2,3,4,5,6,7,8,9,10,11,13,23,14,15,25)]
+    #neworder<-levels(data$chro)[c(1,12,16,17,18,19,20,24,21,22,2,3,4,5,6,7,8,9,10,11,13,23,14,15,25)]
+    neworder<-Filter(function(x) x %in% levels(data$chro), strsplit("chr1 chr2 chr3 chr4 chr5 chr6 chr7 chrX chr8 chr9 chr10 chr11 chr12 chr13 chr14 chr15 chr16 chr17 chr18 chr20 chrY chr19 chr22 chr21 chrM" ," ")[[1]]
     data$chro<-factor(data$chro,neworder)
     data<-data[with(data,order(chro,start)),]
     data}
