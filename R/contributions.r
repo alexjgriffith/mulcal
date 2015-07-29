@@ -42,7 +42,7 @@ stackedContrib<-function(data,
                  function(x){x<min+width})
         a<-lapply(f,function(f)f(vector))
         unlist(a[[1]]==a[[2]])}
-    names(swCat)<-catagories
+    #names(swCat)<-catagories
     catagories2<-unique(swCat)
     bounds<-lapply(f,function(x) x(data))
     names(bounds)<-c("max","min")
